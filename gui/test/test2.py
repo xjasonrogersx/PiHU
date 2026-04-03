@@ -67,7 +67,7 @@ overlay_frame.place(x=panel_x, y=panel_y)
 speed_label = ctk.CTkLabel(
     overlay_frame,
     text="???",
-    font=("Nunito Black", 72, "bold"),
+    font=("Nunito", 72, "bold"),
     text_color="white"
 )
 speed_label.pack(expand=True)
