@@ -154,3 +154,49 @@ Piping to FFplay
 ```
 ./dab_aac 216928000 21 32 | ffplay -i - -nodisp
 ```
+
+```
+# Run this before starting the tuner
+mkfifo /tmp/dab_pipe
+chmod 666 /tmp/dab_pipe
+```
+
+```
+ffplay -i /tmp/dab_pipe -nodisp -autoexit
+```
+
+Forcing to headphones
+
+```
+PULSE_SINK=0 ffplay -i /tmp/dab_pipe -nodisp
+```
+
+```
+mkfifo /tmp/dab_pipe
+chmod 666 /tmp/dab_pipe
+PULSE_SINK=0 ffplay -ar 48000 -i /tmp/dab_pipe -nodisp -fflags nobuffer
+```
+
+## Buster specific Audio
+
+```
+pi@PiHU:/tmp $ aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: Headphones [bcm2835 Headphones], device 0: bcm2835 Headphones [bcm2835 Headphones]
+  Subdevices: 8/8
+  Subdevice #0: subdevice #0
+  Subdevice #1: subdevice #1
+  Subdevice #2: subdevice #2
+  Subdevice #3: subdevice #3
+  Subdevice #4: subdevice #4
+  Subdevice #5: subdevice #5
+  Subdevice #6: subdevice #6
+  Subdevice #7: subdevice #7
+
+```
+
+```
+pi@PiHU:/tmp $ pactl list short sinks
+0	alsa_output.platform-bcm2835_audio.analog-stereo	module-alsa-card.c	s16le 2ch 48000Hz	SUSPENDED
+
+```

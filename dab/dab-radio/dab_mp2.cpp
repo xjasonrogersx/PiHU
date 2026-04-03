@@ -1,11 +1,11 @@
-#include "raon_tuner.h"
 #include <iostream>
 
-class CoutMscObserver: public MscObserver {
-    void mscData(const std::vector<uint8_t>& data) {
-        for (auto i: data)
-            std::cout << i; 
-    }
+#include "raon_tuner.h"
+
+class CoutMscObserver : public MscObserver {
+  void mscData(const std::vector<uint8_t>& data) {
+    for (auto i : data) std::cout << i;
+  }
 };
 
 void usage() {
@@ -21,23 +21,22 @@ void usage() {
                "\n";
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[]) {
+  if (argc != 3) {
+    usage();
+    return EXIT_FAILURE;
+  }
 
-    if(argc != 3) {
-        usage();
-        return EXIT_FAILURE;
-    }
+  RaonTunerInput* tuner = new RaonTunerInput();
+  CoutMscObserver* mscObserver = new CoutMscObserver();
+  tuner->initialize();
+  tuner->tuneFrequency(atoi(argv[1]));
+  tuner->openSubChannel(atoi(argv[2]));
+  tuner->setMscObserver(mscObserver);
 
-	RaonTunerInput *tuner = new RaonTunerInput();
-    CoutMscObserver *mscObserver = new CoutMscObserver();
-	tuner->initialize();
-    tuner->tuneFrequency(atoi(argv[1]));
-    tuner->openSubChannel(atoi(argv[2]));
-    tuner->setMscObserver(mscObserver);
-
-    while(1) {
-        tuner->readData();
-    }
-	delete tuner;
-    return EXIT_SUCCESS;
+  while (1) {
+    tuner->readData();
+  }
+  delete tuner;
+  return EXIT_SUCCESS;
 }
