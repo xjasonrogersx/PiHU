@@ -2,6 +2,8 @@ import tkinter as tk
 import customtkinter as ctk
 import sys
 from PIL import Image, ImageTk
+import paho.mqtt.client as mqtt
+import threading
 
 # Parse command line arguments
 fullscreen_mode = "--fullscreen" in sys.argv
@@ -64,11 +66,54 @@ overlay_frame.place(x=panel_x, y=panel_y)
 # Add the speed text in Nunito Black font
 speed_label = ctk.CTkLabel(
     overlay_frame,
-    text="60Kph",
+    text="???",
     font=("Nunito Black", 72, "bold"),
     text_color="white"
 )
 speed_label.pack(expand=True)
+
+# MQTT Configuration
+mqtt_broker = "localhost"
+mqtt_port = 1883
+mqtt_topic = "car/speed"
+
+# MQTT Callbacks
+def on_connect(client, userdata, flags, rc):
+    if rc == 0:
+        print("Connected to MQTT broker")
+        client.subscribe(mqtt_topic)
+        print(f"Subscribed to topic: {mqtt_topic}")
+    else:
+        print(f"Failed to connect, return code {rc}")
+
+def on_message(client, userdata, msg):
+    try:
+        speed_value = msg.payload.decode().strip()
+        # Update the label in a thread-safe manner
+        root.after(0, lambda: speed_label.configure(text=f"{speed_value} km/h"))
+    except Exception as e:
+        print(f"Error processing message: {e}")
+
+def on_disconnect(client, userdata, rc):
+    if rc != 0:
+        print(f"Unexpected disconnection, return code {rc}")
+
+# Initialize MQTT client
+mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+mqtt_client.on_connect = on_connect
+mqtt_client.on_message = on_message
+mqtt_client.on_disconnect = on_disconnect
+
+# Connect to MQTT broker in a separate thread
+def mqtt_connect():
+    try:
+        mqtt_client.connect(mqtt_broker, mqtt_port, keepalive=60)
+        mqtt_client.loop_forever()
+    except Exception as e:
+        print(f"MQTT Connection Error: {e}")
+
+mqtt_thread = threading.Thread(target=mqtt_connect, daemon=True)
+mqtt_thread.start()
 
 root.mainloop()
 

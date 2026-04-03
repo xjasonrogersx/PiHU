@@ -45,6 +45,15 @@ sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 ```
 
+or
+
+```
+docker exec -it gracious_rubin mosquitto
+
+mosquitto_pub -h localhost -t car/speed -m "60"
+```
+
+
 ## OpenAuto
 
 So this is the nightmare bit. I have tried and fails multiple times to install and build OpenAuto.
