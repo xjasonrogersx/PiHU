@@ -1,11 +1,3 @@
-# ‎Gemini – direct access to Google AI
-
-[
-
-Gemini
-
-](/app)
-
 # **Tkinter Dashboard UI Design**
 
 [https://gemini.google.com/share/805b71e566af](https://gemini.google.com/share/805b71e566af)
