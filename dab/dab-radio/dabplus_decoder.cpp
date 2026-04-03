@@ -415,8 +415,12 @@ void DabPlusServiceComponentDecoder::ProcessUntouchedStream(const uint8_t* data,
   // for (auto i: latm_data)
   //     std::cout << i;
   static int fd = -1;
-  if (fd < 0) fd = open("/tmp/dab_pipe", O_WRONLY | O_NONBLOCK);
-  write(fd, latm_data.data(), latm_data.size());
+  if (fd < 0) {
+    fd = open("/tmp/dab_pipe", O_WRONLY | O_NONBLOCK);
+    std::cout << "Pipe Opened\n";
+  }
+  auto written = write(fd, latm_data.data(), latm_data.size());
+  std::cout << "written : " << written << "\n";
 }
 
 const uint16_t DabPlusServiceComponentDecoder::FIRECODE_TABLE[256] = {
