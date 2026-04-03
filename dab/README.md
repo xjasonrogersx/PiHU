@@ -15,16 +15,7 @@ SUBSYSTEM=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05dc", MODE="0666"
 
 ```
 
-## DabLin
-
-I install dablin an
-
-```
-sudo apt update
-sudo apt install dablin rtl-sdr
-```
-
-##
+## jjj
 
 https://github.com/chrisjohnson1988/dab-radio?tab=readme-ov-file
 
