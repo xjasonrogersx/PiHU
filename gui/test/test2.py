@@ -63,20 +63,15 @@ def load_background_image(image_path):
 # Load initial background image
 load_background_image(image_list[0])
 
-# Keyboard event handlers for switching images
-def on_key_1(event):
-    load_background_image(image_list[0])
-
-def on_key_2(event):
-    load_background_image(image_list[1])
-
-def on_key_3(event):
-    load_background_image(image_list[2])
+# Keyboard event handler for switching images
+def on_key_image(event, index):
+    load_background_image(image_list[index])
+    mqtt_client.publish(mqtt_topic_bg, str(index))
 
 # Bind keyboard events
-root.bind('1', on_key_1)
-root.bind('2', on_key_2)
-root.bind('3', on_key_3)
+root.bind('1', lambda e: on_key_image(e, 0))
+root.bind('2', lambda e: on_key_image(e, 1))
+root.bind('3', lambda e: on_key_image(e, 2))
 
 # Create panel with 80% of full height
 panel_width = 300
@@ -107,22 +102,37 @@ speed_label.pack(expand=True)
 # MQTT Configuration
 mqtt_broker = "localhost"
 mqtt_port = 1883
-mqtt_topic = "car/speed"
+mqtt_topic_speed = "car/speed"
+mqtt_topic_bg = "car/HU/bg_image"
 
 # MQTT Callbacks
 def on_connect(client, userdata, flags, rc):
     if rc == 0:
         print("Connected to MQTT broker")
-        client.subscribe(mqtt_topic)
-        print(f"Subscribed to topic: {mqtt_topic}")
+        client.subscribe(mqtt_topic_speed)
+        client.subscribe(mqtt_topic_bg)
+        print(f"Subscribed to topics: {mqtt_topic_speed}, {mqtt_topic_bg}")
     else:
         print(f"Failed to connect, return code {rc}")
 
 def on_message(client, userdata, msg):
     try:
-        speed_value = msg.payload.decode().strip()
-        # Update the label in a thread-safe manner
-        root.after(0, lambda: speed_label.configure(text=f"{speed_value} km/h"))
+        if msg.topic == mqtt_topic_speed:
+            speed_value = msg.payload.decode().strip()
+            # Update the label in a thread-safe manner
+            root.after(0, lambda: speed_label.configure(text=f"{speed_value} km/h"))
+        elif msg.topic == mqtt_topic_bg:
+            bg_index = msg.payload.decode().strip()
+            try:
+                # Try to parse as integer index
+                index = int(bg_index)
+                if 0 <= index < len(image_list):
+                    root.after(0, lambda: load_background_image(image_list[index]))
+                else:
+                    print(f"Invalid image index: {index}. Must be 0-{len(image_list)-1}")
+            except ValueError:
+                # If it's not a number, treat it as a file path
+                root.after(0, lambda: load_background_image(bg_index))
     except Exception as e:
         print(f"Error processing message: {e}")
 
