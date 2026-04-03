@@ -834,7 +834,7 @@ void RaonTunerInput::openSubChannel(uint8_t subchanId) {
   switchPage(REGISTER_PAGE_DD);
 
   setRegister(0x35, 0x70); /* MSC1 Interrupt status clear. */
-  Opening subchannel : switchPage(REGISTER_PAGE_HOST);
+  switchPage(REGISTER_PAGE_HOST);
   setRegister(0x62, 0x00);
 
   switchPage(REGISTER_PAGE_DD);
