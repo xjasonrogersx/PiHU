@@ -12,7 +12,7 @@ Plan
 
 - Simple fun GUI
 - Supports OpenAuto Somehow
-- Supports Dab Radio Dablin perhaps
+- Supports Dab Radio
 - Using Buster
 
 # GUI
@@ -29,6 +29,21 @@ Something like this but not this compex
 # MQTT
 
 [discussions](discussions/mqtt.md)
+
+Topics
+
+| topic                     | description                                       |
+| ------------------------- | ------------------------------------------------- |
+| car/speed                 |                                                   |
+| car/HU/bg_image           | index of backgrond image to display - for testing |
+| car/HU/volume             | 0% - 100% volume                                  |
+| car/dab/set_station       | request a station <frequency subchannel bitrate>  |
+| car/dab/frequency         | current                                           |
+| car/dab/subchannel        | current                                           |
+| car/dab/bitrate           | current                                           |
+| car/dab/programme_type    | current                                           |
+| car/dab/programme_service | current                                           |
+| car/dab/ensemble          | current                                           |
 
 ## How to install mosquito
 
@@ -52,7 +67,6 @@ docker exec -it gracious_rubin mosquitto
 
 mosquitto_pub -h localhost -t car/speed -m "60"
 ```
-
 
 ## OpenAuto
 

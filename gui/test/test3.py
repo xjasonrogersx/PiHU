@@ -7,9 +7,9 @@ import threading
 
 
 image_list = [
-    "/workspace/PiHU/images/1775206919136.png", # car right
-    "/workspace/PiHU/images/1775206081435.png", # car middle
-    "/workspace/PiHU/images/1775205902337.png" ## PiHU logo
+    "../../images/1775206919136.png", # car right
+    "../../images/1775206081435.png", # car middle
+    "../../images/1775205902337.png" ## PiHU logo
 ]
 
 # Global variable to store background photo reference
@@ -65,7 +65,6 @@ load_background_image(image_list[0])
 
 # Keyboard event handler for switching images
 def on_key_image(event, index):
-    load_background_image(image_list[index])
     mqtt_client.publish(mqtt_topic_bg, str(index))
 
 # Bind keyboard events
@@ -103,8 +102,8 @@ def draw_panel_with_speed(speed_text):
     speed_font = None
     kmh_font = None
     font_paths = [
-        "/workspace/PiHU/gui/test/nunito.black.ttf",
-        "/workspace/PiHU/gui/test/nunito.black.ttf"
+        "../../gui/test/nunito.black.ttf",
+        "../../gui/test/nunito.black.ttf"
     ]
     
     for font_path in font_paths:
