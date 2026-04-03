@@ -5,6 +5,17 @@ from PIL import Image, ImageTk
 import paho.mqtt.client as mqtt
 import threading
 
+
+image_list = [
+    "/workspace/PiHU/images/1775206919136.png", # car right
+    "/workspace/PiHU/images/1775206081435.png", # car middle
+    "/workspace/PiHU/images/1775205902337.png" ## PiHU logo
+]
+
+# Global variable to store background photo reference
+bg_photo = None
+
+
 # Parse command line arguments
 fullscreen_mode = "--fullscreen" in sys.argv
 
@@ -35,16 +46,37 @@ main_frame.pack(fill=tk.BOTH, expand=True)
 canvas = tk.Canvas(main_frame, highlightthickness=0)
 canvas.pack(fill=tk.BOTH, expand=True)
 
-# Load and display the background image
-try:
-    bg_image = Image.open("/workspace/PiHU/images/1775206919136.png")
-    # Resize image to fit window
-    bg_image = bg_image.resize((window_width, window_height), Image.Resampling.LANCZOS)
-    bg_photo = ImageTk.PhotoImage(bg_image)
-    canvas.create_image(0, 0, image=bg_photo, anchor="nw")
-    canvas.image = bg_photo  # Keep a reference
-except Exception as e:
-    print(f"Error loading image: {e}")
+# Function to load and display background image
+def load_background_image(image_path):
+    global bg_photo
+    try:
+        bg_image = Image.open(image_path)
+        # Resize image to fit window
+        bg_image = bg_image.resize((window_width, window_height), Image.Resampling.LANCZOS)
+        bg_photo = ImageTk.PhotoImage(bg_image)
+        canvas.delete("bg")
+        canvas.create_image(0, 0, image=bg_photo, anchor="nw", tags="bg")
+        print(f"Loaded background image: {image_path}")
+    except Exception as e:
+        print(f"Error loading image: {e}")
+
+# Load initial background image
+load_background_image(image_list[0])
+
+# Keyboard event handlers for switching images
+def on_key_1(event):
+    load_background_image(image_list[0])
+
+def on_key_2(event):
+    load_background_image(image_list[1])
+
+def on_key_3(event):
+    load_background_image(image_list[2])
+
+# Bind keyboard events
+root.bind('1', on_key_1)
+root.bind('2', on_key_2)
+root.bind('3', on_key_3)
 
 # Create panel with 80% of full height
 panel_width = 300
