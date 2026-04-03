@@ -1,11 +1,3 @@
-# ‎Gemini – direct access to Google AI
-
-[
-
-Gemini
-
-](/app)
-
 # **MQTT for Linux Head Unit Communication**
 
 [https://gemini.google.com/share/1859d8487aa5](https://gemini.google.com/share/1859d8487aa5)
