@@ -7,6 +7,26 @@ pip install -r requirements.txt
 
 ```
 
+## Test1
+
+Just an example
+
+<img width="650" height="661" alt="image" src="https://github.com/user-attachments/assets/8ae2c5cd-0135-433b-9841-80e9116de89a" />
+
+## Test2
+
+ * Uses MQTT ( speed published with pub.py car/speed )
+ * background image can be change with keys 1,2,3.  message published to car/HU/bg_image
+
+<img width="1046" height="852" alt="image" src="https://github.com/user-attachments/assets/2dea978a-294b-4ee9-8949-240dfb7f2ac2" />
+
+
+## Test3
+
+* Compositing with PIL.   this handles transparncy and test outline.   
+
+<img width="1088" height="870" alt="image" src="https://github.com/user-attachments/assets/a6033fab-8919-4dcc-b862-89b0e1c3b70a" />
+
 
 
 
