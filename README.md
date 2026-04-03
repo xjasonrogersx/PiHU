@@ -26,7 +26,9 @@ Something like this but not this compex
 [discussions](discussions/tkinter.md)
 [discussions](discussions/tkinter1.md)
 
+# Dab Radio intergarions
 
+wip
 
 # MQTT
 
@@ -82,7 +84,7 @@ links:
 
 https://github.com/opencardev/prebuilts
 
-## DubLin
+
 
 installations
 
