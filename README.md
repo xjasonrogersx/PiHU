@@ -19,12 +19,16 @@ Plan
 
 Something like this but not this compex
 
-![](images/1775207006248.png)
-
-![](images/1775206749039.png)
+| mockup 1 | mockup 2 |
+| -- | -- |
+| ![](images/1775207006248.png) | ![](images/1775206749039.png) |
 
 [discussions](discussions/tkinter.md)
 [discussions](discussions/tkinter1.md)
+
+# Dab Radio intergarions
+
+wip
 
 # MQTT
 
@@ -80,7 +84,7 @@ links:
 
 https://github.com/opencardev/prebuilts
 
-## DubLin
+
 
 installations
 

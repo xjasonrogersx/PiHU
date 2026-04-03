@@ -19,6 +19,8 @@ Just an example
 
 - uses a bit of hack to fix the corner issue - it fills with the top left colour of the backround image
 
+<img width="1366" height="768" alt="image" src="https://github.com/user-attachments/assets/72e096da-7ca3-48e4-80d2-cba50ed21973" />
+
 ## Test3
 
 - Compositing with PIL. this handles transparncy and test outline.
