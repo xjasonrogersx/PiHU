@@ -45,6 +45,22 @@ sudo systemctl enable mosquitto
 sudo systemctl start mosquitto
 ```
 
+## OpenAuto
+
+So this is the nightmare bit. I have tried and fails multiple times to install and build OpenAuto.
+
+https://github.com/opencardev/openauto
+
+Crankshaft did work, but its not quite what I want.
+
+links:
+
+https://github.com/opencardev/prebuilts
+
+## DubLin
+
+installations
+
 ## Images
 
 ![](images/1775206081435.png)
