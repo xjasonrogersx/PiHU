@@ -30,6 +30,21 @@ Something like this but not this compex
 
 [discussions](discussions/mqtt.md)
 
+## How to install mosquito
+
+install:
+
+```bash
+sudo apt install mosquitto mosquitto-clients
+```
+
+start:
+
+```bash
+sudo systemctl enable mosquitto
+sudo systemctl start mosquitto
+```
+
 ## Images
 
 ![](images/1775206081435.png)
