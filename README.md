@@ -50,6 +50,10 @@ Full details on Dab intergration [here](dab/README.md)
 
 # MQTT
 
+Why have seperate Apps and communicte between them with MQTT.
+
+
+
 [discussions](discussions/mqtt.md)
 
 Topics
@@ -118,6 +122,13 @@ The question is,  do I strip down my current using and try and reuse the existin
 Do I use enclosure and replace the panel inside?
 Do I get a full in replacement panel and enclosure?
 Or do i get a barebone panel and make a new enclosure?
+
+| option | brigtness | enclosude | price |
+| -- | -- | -- | -- |
+|
+![alt text](images/display-y.png) ![ ](images/MPI1008.png) 10.1 inch 1280x800 IPS MPI1008 http://www.lcdwiki.com/10.1inch_HDMI_Display-Y | 220cd/m2 button addjustment  | plastic | ~£50 |
+| 10.1 Inch 1280*800 TFT EJ101IA-01G HD LCD Display Touch Screen Remote Driver Board 2AV VGA For Raspberry Pi 3 [AliEpress](https://www.aliexpress.com/item/32920662451.html?spm=a2g0o.productlist.main.5.493a753ezUSlru&algo_pvid=bfda887a-1491-4815-ba0a-dcd24c721d4c&algo_exp_id=bfda887a-1491-4815-ba0a-dcd24c721d4c-4&pdp_ext_f=%7B%22order%22%3A%2217%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21GBP%2158.30%2140.81%21%21%2174.88%2152.41%21%40211b612517753430462841646e6a3c%2112000042152825609%21sea%21UK%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3A72912a7b%3Bm03_new_user%3A-29895%3BpisId%3A5000000197842856&curPageLogUid=T1BA53JcnbQe&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32920662451%7C_p_origin_prod%3A) | 350 cd/m2 | none | ~£50 |
+| ![alt text](images/display-s.png) 10.1 inch 1280x800 Capacitive Touch Screen. Connections on side.  NOT SUITABLE https://www.lcdwiki.com/10.1inch_HDMI_Display-S | 250 cd/m2 rotarty adjusrment | metal | |
 
 
 ### Amplifier
