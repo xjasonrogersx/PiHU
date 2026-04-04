@@ -1,5 +1,23 @@
 # DAB
 
+This is the DAB Dongle I brough back in 2023 to use with the Android head unit. 
+
+| 1 | 2 |
+| -- | -- |
+| ![img](../images/dab-dongle1.jpeg) | ![img](../images/dab-dongle2.jpeg)
+
+It's currently in the car and the antenna is stuck to the windshield with the cables carefully hidding.
+
+I can dig teh dongle from behind my current head unit and connect it to the Pi.   I powered the Pi from a battery pack and it was connected to my WiFi allowing me to test from the comfort of the sofa with my feet up.
+
+| 1 | 2 |
+| -- | -- |
+| ![img](../images/dab-test1.jpeg) | ![img](../images/dab-test2.jpeg)
+
+
+Running lsusb to see what the pi can see on the USB bus:
+
+
 ```
 pi@PiHU:~ $ lsusb
 Bus 001 Device 005: ID 16c0:05dc Van Ooijen Technische Informatica shared ID for use with libusb
@@ -8,16 +26,27 @@ Bus 001 Device 002: ID 0424:9514 Standard Microsystems Corp. SMC9514 Hub
 Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
 ```
 
-```
-sudo nano /etc/udev/rules.d/99-dab.rules
+Apparently this pci device id is a bit of a camelean ( to qoute gemenai) and is used by multiple devices.  
 
+Giving permisions,  add the following to `/etc/udev/rules.d/99-dab.rules`
+
+```
 SUBSYSTEM=="usb", ATTRS{idVendor}=="16c0", ATTRS{idProduct}=="05dc", MODE="0666"
 
 ```
 
-## jjj
+## Failed attempts
+
+I was initaly plannign to use DabLin but this failed to find the device.   Myself and Gemenai went round in circles with other tools
+
+[here]( ../discussions/dab-radio.md)
+
+## Success
+
+I eventualy had some success with this repo:
 
 https://github.com/chrisjohnson1988/dab-radio?tab=readme-ov-file
+
 
 ```
 pi@PiHU:~/dab-radio $ ./dab_scan

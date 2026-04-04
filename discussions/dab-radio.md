@@ -6,11 +6,11 @@ Created with **Fast** 3 April 2026 at 14:52 Published on 3 April 2026 at 15:36
 
 You said
 
-since is see
+    since is see
 
-Bus 001 Device 005: ID 16c0:05dc Van Ooijen Technische Informatica shared ID for use with libusb
+    Bus 001 Device 005: ID 16c0:05dc Van Ooijen Technische Informatica shared ID for use with libusb
 
-i think this might be good
+    i think this might be good
 
 https://github.com/chrisjohnson1988/dab-radio
 
@@ -36,29 +36,29 @@ If you are planning to use it for a media server setup, that repo is likely exac
 
 You said
 
-pi@PiHU:~/dab-radio $ make
+    pi@PiHU:~/dab-radio $ make
 
-rm -f \*.o
+    rm -f \*.o
 
-rm -f dab_scan dab_mp2 dab_aac
+    rm -f dab_scan dab_mp2 dab_aac
 
-g++ -std=c++11 -frtti -fexceptions   -c -o m3u_writer.o m3u_writer.cpp
+    g++ -std=c++11 -frtti -fexceptions   -c -o m3u_writer.o m3u_writer.cpp
 
-In file included from dab_scanner.h:8,
+    In file included from dab_scanner.h:8,
 
-from m3u_writer.h:6,
+    from m3u_writer.h:6,
 
-from m3u_writer.cpp:2:
+    from m3u_writer.cpp:2:
 
-raon_tuner.h:31:10: fatal error: libusb-1.0/libusb.h: No such file or directory
+    raon_tuner.h:31:10: fatal error: libusb-1.0/libusb.h: No such file or directory
 
-#include <libusb-1.0/libusb.h>
+    #include <libusb-1.0/libusb.h>
 
-^~~~~~~~~~~~~~~~~~~~~
+    ^~~~~~~~~~~~~~~~~~~~~
 
-compilation terminated.
+    compilation terminated.
 
-make: \*\*\* \[<builtin>: m3u_writer.o\] Error 1
+    make: \*\*\* \[<builtin>: m3u_writer.o\] Error 1
 
 It looks like the compiler is searching for the `libusb` headers and coming up empty-handed. While `libusb` is usually installed on most Linux systems by default, the **development headers** (the files ending in `.h` that a compiler needs to build new software) are often separate.
 

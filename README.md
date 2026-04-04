@@ -1,21 +1,29 @@
 # PiHU
 
-A Pi based Linux headunit
+A Pi based Linux headunit from my car.  
+
+I currently have a cheap chinese 10.1" Android head unit.  This can do Android Auto and Dab Radio but does have it's issues.  Sometimes it loosed Audio after a short stop and requres a reboot - not very conveniuent while driving.    
+
+I'll document the development as I go, including my discussions with Gemenai and Co-Pilot. (Don't tell Gemenai I'm talking with Co-Pilot,  he'll get jellous)
 
 # Logo
+
+First things first,  Desing a logo with Gemani
 
 | 1                             | 2                             |
 | ----------------------------- | ----------------------------- |
 | ![](images/1775205902337.png) | ![](images/1775206450840.png) |
 
-Plan
+# The Plan
+
+Make some requirments
 
 - Simple fun GUI
-- Supports OpenAuto Somehow
+- Supports OpenAuto Somehow 
 - Supports Dab Radio
-- Using Buster
+- Using Buster ( becuase apparently this is what OpenAuto requires )
 
-# GUI
+# GUI #1
 
 Something like this but not this compex
 
@@ -26,9 +34,19 @@ Something like this but not this compex
 [discussions](discussions/tkinter.md)
 [discussions](discussions/tkinter1.md)
 
+Full details on the Gui develoment [here](gui/README.md)
+
 # Dab Radio intergarions
 
-wip
+This is the dongle I currently have.
+Its apparenly a keystone dab chip rathern than a SDR based dongle.  
+
+| 1 | 2 |
+| -- | -- |
+| ![img](images/dab-dongle1.jpeg) | ![img](images/dab-dongle2.jpeg) |
+
+Full details on Dab intergration [here](dab/README.md)
+
 
 # MQTT
 
