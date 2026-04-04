@@ -23,20 +23,20 @@ Make some requirments
 - Supports Dab Radio
 - Using Buster ( becuase apparently this is what OpenAuto requires )
 
-# GUI #1
+# GUI Mockup
 
 Something like this but not this compex
 
-| mockup 1 | mockup 2 |
+| mockup 1 | notes |
 | -- | -- |
-| ![](images/1775207006248.png) | ![](images/1775206749039.png) |
+| ![](images/1775207006248.png) | Too much info to see |
+| ![](images/status1.jpeg) | |
 
-[discussions](discussions/tkinter.md)
-[discussions](discussions/tkinter1.md)
+
 
 Full details on the Gui develoment [here](gui/README.md)
 
-# Dab Radio intergarions
+# Dab Radio integration
 
 This is the dongle I currently have.
 Its apparenly a keystone dab chip rathern than a SDR based dongle.  
@@ -106,6 +106,25 @@ https://github.com/opencardev/prebuilts
 
 installations
 
-## Images
+## Hardware
 
-![](images/1775206081435.png)
+I still need to get some more hardware,
+I have a number of things in AliBaba Basket.
+
+
+### Screen
+
+The question is,  do I strip down my current using and try and reuse the existing panel and touch.   
+Do I use enclosure and replace the panel inside?
+Do I get a full in replacement panel and enclosure?
+Or do i get a barebone panel and make a new enclosure?
+
+
+### Amplifier
+
+This is being delivered today.    
+
+### Power
+
+todo
+
