@@ -97,8 +97,7 @@ def make_block(hash_val, uml_content):
     return (
         f'![](.img/{hash_val}.png)\n'
         f'<details>\n'
-        f'<summary>View UML</summary>\n'
-        f'\n'
+        f'<summary>View UML</summary>\n\n'
         f'```uml\n'
         f'{uml_content}'
         f'```\n'
@@ -111,7 +110,7 @@ def make_block(hash_val, uml_content):
 # is listed first in the alternation so it takes priority.
 _PATTERN = re.compile(
     r'!\[\]\(\.img/([a-f0-9]{32})\.png\)\n'
-    r'<details>\n<summary>View UML</summary>\n'
+    r'<details>\n<summary>View UML</summary>\n\n'
     r'```uml\n(.*?)```\n'
     r'</details>'
     r'|'

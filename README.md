@@ -143,7 +143,7 @@ todo
 
 ## Architecture diragram so far
 
-![](.img/2a50f671daaf6e9315b6e2950ff41225.png)
+![](.img/8ea0163836a2e8516006d2e00cf4c46b.png)
 <details>
 <summary>View UML</summary>
 
@@ -227,7 +227,7 @@ note top of MQTT #white
 end note
  
 note top of FIFO #white
-  💦 **High-Speed Audio Flow**
+  **High-Speed Audio Flow**
   *(Synchronous, continuous)*
 end note
 ```
