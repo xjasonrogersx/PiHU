@@ -1,0 +1,4 @@
+!theme toy
+skinparam handwritten true
+skinparam DefaultFontName "Architects Daughter"
+skinparam defaultTextAlignment center

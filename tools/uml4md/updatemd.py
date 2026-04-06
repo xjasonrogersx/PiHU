@@ -98,6 +98,7 @@ def make_block(hash_val, uml_content):
         f'![](.img/{hash_val}.png)\n'
         f'<details>\n'
         f'<summary>View UML</summary>\n'
+        f'\n'
         f'```uml\n'
         f'{uml_content}'
         f'```\n'
