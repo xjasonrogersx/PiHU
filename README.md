@@ -141,3 +141,96 @@ This is being delivered today.
 
 todo
 
+## Architecture diragram so far
+
+![](.img/2a50f671daaf6e9315b6e2950ff41225.png)
+<details>
+<summary>View UML</summary>
+
+```uml
+title PiHU DAB Radio: Architecture Diagram
+ 
+' --- Defining Icons and Components ---
+skinparam componentStyle uml2
+skinparam nodesep 100
+skinparam ranksep 100
+ 
+rectangle "Physical Interface" as Phys #f0f0f0 {
+    [🔊\nSpeakers\n(Stereo Out)] as Speakers <<$output_devices>> #lightgreen
+    [🔄\nRotary\nEncoder\n(Volume)] as Knob <<$input_devices>> #lightsalmon
+    [⏭️\nSkip\nButton] as Button <<$input_devices>> #lightsalmon
+}
+ 
+rectangle "Hardware Layer" as HW #d0e0ff {
+    [📡\nDAB+ SDR\n(USB Dongle)] as SDR <<$hardware>> #lightblue
+    [🍓\nRaspberry Pi\n(Running Buster)] as Pi <<$microchip>> #mistyrose
+}
+ 
+' --- Defining Software Processes (The Fun Stuff) ---
+rectangle "Software: The Team" as SW #fff {
+ 
+    package "The Interface" as PackageGUI #white {
+        [📺\nGUI App\n(The Face)] as GUI <<(P,#ADD8E6)>> #powderblue
+    }
+ 
+    package "The Drivers" as PackageDrivers #white {
+        [🎧\nSystem Daemon\n(The Muscle)] as System <<(P,#ADD8E6)>> #lightcyan
+        [🛠️\nHardware Daemon\n(The Tinkerer)] as HWDae <<(P,#ADD8E6)>> #moccasin
+    }
+ 
+    package "The Radio" as PackageRadio #white {
+        [📻\nDAB-Tuner\n(The Ear)] as Tuner <<(P,#ADD8E6)>> #lavender
+        [🎼\nFFPlay\n(The Voice)] as FFplay <<(P,#ADD8E6)>> #lemonchiffon
+    }
+}
+ 
+' --- Communication Nodes ---
+queue "The Chat Room\n(MQTT Broker/Mosquitto)" as MQTT <<$network>> #lightgray
+ 
+() "/tmp/dab_pipe\n(Named Pipe)" as FIFO <<$folder>> #orange
+ 
+' --- Interconnections & Action Flows ---
+ 
+' 1. Output Path (The Main Event)
+SDR -[#gray,thickness=2]-> Tuner : (Raw I/Q via USB)
+Tuner -[#orange,dashed,bold,thickness=3]-> FIFO : (AAC Stream)
+FIFO -[#orange,dashed,bold,thickness=3]-> FFplay : (Decode)
+FFplay -[#green,thickness=2]-> System : (Digital Audio)
+System -[#green,bold,thickness=2]-> Speakers : (Analog Audio via ALSA)
+ 
+' 2. Input Path (Volume & Skip)
+Knob -[#salmon,thickness=2]-> HWDae : (Encoder Clicks)
+Button -[#salmon,thickness=2]-> HWDae : (Button Press)
+HWDae -[#blue,bold,thickness=2]-> MQTT : [Publish]\ncmnd/volume/delta\ncmnd/radio/skip
+ 
+' 3. Control Loops (The Brain)
+' Volume
+MQTT -[#red,thickness=2]-> System : [Subscribe]\ncmnd/volume/set
+System -[#green,thickness=2]-> System : (Internal logic: call amixer)
+System -[#blue,thickness=2]-> MQTT : [Publish]\nstat/volume/actual
+ 
+' Tune/Skip
+MQTT -[#red,thickness=2]-> Tuner : [Subscribe]\ncmnd/radio/skip\ncmnd/radio/tune_id
+Tuner -[#blue,thickness=2]-> MQTT : [Publish]\nstat/radio/info (Name/Text)
+ 
+' 4. The GUI (Observation & Control)
+GUI -[#blue,thickness=2]-> MQTT : [Publish]\ncmnd/radio/tune_id
+MQTT -[#red,thickness=2]-> GUI : [Subscribe]\nstat/radio/info\nstat/volume/actual
+ 
+' Optional Connection: GUI spawning FFplay
+GUI ..> FFplay : (Spawn process)
+ 
+' --- Legend/Notes (Fun Icons) ---
+note top of MQTT #white
+  ⚡️ **Asynchronous Control**
+  *(Loosely coupled, fast)*
+end note
+ 
+note top of FIFO #white
+  💦 **High-Speed Audio Flow**
+  *(Synchronous, continuous)*
+end note
+```
+</details>
+
+
