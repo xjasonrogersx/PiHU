@@ -1,14 +1,14 @@
 # PiHU
 
-A Pi based Linux headunit from my car.  
+A Pi based Linux headunit from my car.
 
-I currently have a cheap chinese 10.1" Android head unit.  This can do Android Auto and Dab Radio but does have it's issues.  Sometimes it loosed Audio after a short stop and requres a reboot - not very conveniuent while driving.    
+I currently have a cheap chinese 9" Android head unit. This can do Android Auto and Dab Radio but does have it's issues. Sometimes it loosed Audio after a short stop and requres a reboot - not very conveniuent while driving.
 
-I'll document the development as I go, including my discussions with Gemenai and Co-Pilot. (Don't tell Gemenai I'm talking with Co-Pilot,  he'll get jellous)
+I'll document the development as I go, including my discussions with Gemini and Co-Pilot. (Don't tell Gemini I'm talking with Co-Pilot, he'll get jellous)
 
 # Logo
 
-First things first,  Desing a logo with Gemani
+First things first, Desing a logo with Gemani
 
 | 1                             | 2                             |
 | ----------------------------- | ----------------------------- |
@@ -19,7 +19,7 @@ First things first,  Desing a logo with Gemani
 Make some requirments
 
 - Simple fun GUI
-- Supports OpenAuto Somehow 
+- Supports OpenAuto Somehow
 - Supports Dab Radio
 - Using Buster ( becuase apparently this is what OpenAuto requires )
 
@@ -27,32 +27,27 @@ Make some requirments
 
 Something like this but not this compex
 
-| mockup 1 | notes |
-| -- | -- |
+| mockup 1                      | notes                |
+| ----------------------------- | -------------------- |
 | ![](images/1775207006248.png) | Too much info to see |
-| ![](images/status1.jpeg) | |
-
-
+| ![](images/status1.jpeg)      |                      |
 
 Full details on the Gui develoment [here](gui/README.md)
 
 # Dab Radio integration
 
 This is the dongle I currently have.
-Its apparenly a keystone dab chip rathern than a SDR based dongle.  
+Its apparenly a keystone dab chip rathern than a SDR based dongle.
 
-| 1 | 2 |
-| -- | -- |
+| 1                               | 2                               |
+| ------------------------------- | ------------------------------- |
 | ![img](images/dab-dongle1.jpeg) | ![img](images/dab-dongle2.jpeg) |
 
 Full details on Dab intergration [here](dab/README.md)
 
-
 # MQTT
 
 Why have seperate Apps and communicte between them with MQTT.
-
-
 
 [discussions](discussions/mqtt.md)
 
@@ -106,36 +101,62 @@ links:
 
 https://github.com/opencardev/prebuilts
 
-
-
 installations
+
+## Current Android Head Unit
+
+This is my current Cheap Chinese android head unit which I got on ebay for £46
+
+![alt text](images/what-i-have.png.png)
+
+- 1024x600
 
 ## Hardware
 
 I still need to get some more hardware,
 I have a number of things in AliBaba Basket.
 
-
 ### Screen
 
-The question is,  do I strip down my current using and try and reuse the existing panel and touch.   
+The question is, do I strip down my current using and try and reuse the existing panel and touch.  
 Do I use enclosure and replace the panel inside?
 Do I get a full in replacement panel and enclosure?
 Or do i get a barebone panel and make a new enclosure?
 
-| option | brigtness | enclosude | price |
-| -- | -- | -- | -- |
-|
-![alt text](images/display-y.png) ![ ](images/MPI1008.png) 10.1 inch 1280x800 IPS MPI1008 http://www.lcdwiki.com/10.1inch_HDMI_Display-Y | 220cd/m2 button addjustment  | plastic | ~£50 |
-| ![ ](10.1 Inch 1280*800 TFT EJ101IA-01G HD LCD Display Touch Screen Remote Driver Board 2AV VGA For Raspberry Pi 3 [AliEpress](https://www.aliexpress.com/item/32920662451.html?spm=a2g0o.productlist.main.5.493a753ezUSlru&algo_pvid=bfda887a-1491-4815-ba0a-dcd24c721d4c&algo_exp_id=bfda887a-1491-4815-ba0a-dcd24c721d4c-4&pdp_ext_f=%7B%22order%22%3A%2217%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21GBP%2158.30%2140.81%21%21%2174.88%2152.41%21%40211b612517753430462841646e6a3c%2112000042152825609%21sea%21UK%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3A72912a7b%3Bm03_new_user%3A-29895%3BpisId%3A5000000197842856&curPageLogUid=T1BA53JcnbQe&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32920662451%7C_p_origin_prod%3A) | 350 cd/m2 | none | ~£50 |
-| ![ ](images/EJ101IA-01G.png) 10.1 Inch 1280*800 TFT EJ101IA-01G HD LCD Display Touch Screen Remote Driver Board 2AV VGA For Raspberry Pi 3 [AliEpress](https://www.aliexpress.com/item/32920662451.html?spm=a2g0o.productlist.main.5.493a753ezUSlru&algo_pvid=bfda887a-1491-4815-ba0a-dcd24c721d4c&algo_exp_id=bfda887a-1491-4815-ba0a-dcd24c721d4c-4&pdp_ext_f=%7B%22order%22%3A%2217%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21GBP%2158.30%2140.81%21%21%2174.88%2152.41%21%40211b612517753430462841646e6a3c%2112000042152825609%21sea%21UK%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3A72912a7b%3Bm03_new_user%3A-29895%3BpisId%3A5000000197842856&curPageLogUid=T1BA53JcnbQe&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32920662451%7C_p_origin_prod%3A) | 350 cd/m2 | none | ~£50 |
-| ![alt text](images/ROADOM.png) ROADOM Touch Screen with Case, 10.1’’ Raspberry Pi Screen, IPS FHD 1024×600,Responsive and Smooth Touch,Dual Built-in Speakers,HDMI Input,Compatible with Raspberry Pi 5/4/3/Zero [Amazon](https://www.amazon.co.uk/ROADOM-Raspberry-1024%C3%97600-Responsive-Compatible/dp/B0DPW4KDR8/ref=asc_df_B0DPW4KDR8?mcid=8b5602a71926328baf9a6775c58ac75d&tag=googshopuk-21&linkCode=df0&hvadid=732381739151&hvpos=&hvnetw=g&hvrand=12352195671574543887&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9045980&hvtargid=pla-2402559317518&hvocijid=12352195671574543887-B0DPW4KDR8-&hvexpln=0&gad_source=1&th=1) | | plastic | £69 |
-| ![alt text](images/display-s.png) 10.1 inch 1280x800 Capacitive Touch Screen. Connections on side.  NOT SUITABLE https://www.lcdwiki.com/10.1inch_HDMI_Display-S | 250 cd/m2 rotarty adjusrment | metal | |
+Options
 
+9 Inch Universal LCD Display Screen Monitor Raspberry Pi Driver Control Board Digitizer Touchscreen DIY Computer Secondary Screen
+£33.00
+Heyman
+https://www.amazon.co.uk/Universal-Raspberry-Digitizer-Touchscreen-Secondary/dp/B0DHGC3YCS/ref=sr_1_4?crid=104HRR4126U42&dib=eyJ2IjoiMSJ9.IFTVg0t5yCM31KmdwNOYkYZP884lpxA6Ebgm6SDjmpElf9V1PR77QncQNYZeaGSwepqfLsrlkGW6ynhzH5mEs0Af9Ts_zOTDq2gSTWNvruosftPtC9xhbxdqGiLG20tgI3f55ms5X8G_LwddNY5mOapLWkePa84eHCsHR34N8zuR10G1HoA9R4Dox2xLOzGy_Yd7EE3py1VxHunV8TG7-c4tJphf4Hoft3aDZ-22f1kkqcfhAEBvbhCIU955-A4jqaXP8Th9AkpSfkiw0r5kN0KugZEHnfis_-PmvyIsYY0.cZhkbg95z8gPVFbXu6mEDcZc2nWT7QFfMPCK5FIdJXk&dib_tag=se&keywords=screen+lcd+9+inch&qid=1775598454&s=computers&sprefix=screen+lcd+9+inch%2Ccomputers%2C287&sr=1-4
+
+---
+
+9 Inch 1024*600 Screen Display LCD Monitor Driver Control Board Digitizer Touchscreen HDMI-Compatible For Orange Raspberry Pi
+£47.59
+1024*600
+Heyman
+file:///home/jason/Downloads/Sb859cd4f75d346fd8e9730152abda8e1d.pdf
+https://www.aliexpress.com/item/1005005346636557.html?spm=a2g0o.productlist.main.2.134c40aeskhitK&algo_pvid=6b04b683-a1cf-42e4-be96-35001f17d961&algo_exp_id=6b04b683-a1cf-42e4-be96-35001f17d961-1&pdp_ext_f=%7B%22order%22%3A%2217%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21GBP%2133.46%2131.79%21%21%21295.32%21280.58%21%40211b80e117755963769461764e229a%2112000032702391587%21sea%21UK%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3Ab151e39a%3Bm03_new_user%3A-29895&curPageLogUid=DyvdMDeBJn28&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A1005005346636557%7C_p_origin_prod%3A
+
+---
+
+h 1024\*600 LCD Display Screen Digitizer Touchscreen Driver Control Board HDMI-Compatible Raspberry Pi DIY Monitor Kit
+1 sold
+byHeyman Store (4.8 | 2,000+ sold )
+￡ 42.29
+https://www.aliexpress.com/item/1005006006310260.html?spm=a2g0o.detail.pcDetailTopMoreOtherSeller.7.65921d9cOsFIqZ&gps-id=pcDetailTopMoreOtherSeller&scm=1007.40050.354490.0&scm_id=1007.40050.354490.0&scm-url=1007.40050.354490.0&pvid=8fcb5cab-ae85-4b59-96e0-32e105896c4d&_t=gps-id:pcDetailTopMoreOtherSeller,scm-url:1007.40050.354490.0,pvid:8fcb5cab-ae85-4b59-96e0-32e105896c4d,tpp_buckets:668%232846%238115%232000&pdp_ext_f=%7B%22order%22%3A%221%22%2C%22eval%22%3A%221%22%2C%22sceneId%22%3A%2230050%22%2C%22fromPage%22%3A%22recommend%22%7D&pdp_npi=6%40dis%21GBP%2134.09%2132.39%21%21%21300.88%21285.88%21%40211b80c217755970369391169e34bc%2112000047107135681%21rec%21UK%21%21ABXZ%211%210%21n_tag%3A-29910%3Bd%3Ab151e39a%3Bm03_new_user%3A-29895&utparam-url=scene%3ApcDetailTopMoreOtherSeller%7Cquery_from%3A%7Cx_object_id%3A1005006006310260%7C_p_origin_prod%3A
+
+---
+
+6.5/7/9/10.1 Inch LCD Screen Display Portable Monitor Driver Control Board Kit For Raspberry Banana/Orange Pi Mini Computer PC
+￡ 26.79
+1024\*600
+https://www.aliexpress.com/item/1005004174788588.html?spm=a2g0o.detail.pcDetailTopMoreOtherSeller.10.65921d9cOsFIqZ&gps-id=pcDetailTopMoreOtherSeller&scm=1007.40050.354490.0&scm_id=1007.40050.354490.0&scm-url=1007.40050.354490.0&pvid=8fcb5cab-ae85-4b59-96e0-32e105896c4d&_t=gps-id:pcDetailTopMoreOtherSeller,scm-url:1007.40050.354490.0,pvid:8fcb5cab-ae85-4b59-96e0-32e105896c4d,tpp_buckets:668%232846%238115%232000&pdp_ext_f=%7B%22order%22%3A%2248%22%2C%22eval%22%3A%221%22%2C%22sceneId%22%3A%2230050%22%2C%22fromPage%22%3A%22recommend%22%7D&pdp_npi=6%40dis%21GBP%2123.84%2122.89%21%21%21210.42%21202.04%21%40211b80c217755970369391169e34bc%2112000028285196254%21rec%21UK%21%21ABXZ%211%210%21n_tag%3A-29910%3Bd%3Ab151e39a%3Bm03_new_user%3A-29895&utparam-url=scene%3ApcDetailTopMoreOtherSeller%7Cquery_from%3A%7Cx_object_id%3A1005004174788588%7C_p_origin_prod%3A
 
 ### Amplifier
 
-This is being delivered today.    
+This is being delivered today.
 
 ### Power
 
@@ -144,93 +165,103 @@ todo
 ## Architecture diragram so far
 
 ![](.img/8ea0163836a2e8516006d2e00cf4c46b.png)
+
 <details>
 <summary>View UML</summary>
 
 ```uml
 title PiHU DAB Radio: Architecture Diagram
- 
+
 ' --- Defining Icons and Components ---
 skinparam componentStyle uml2
 skinparam nodesep 100
 skinparam ranksep 100
- 
+
 rectangle "Physical Interface" as Phys #f0f0f0 {
     [🔊\nSpeakers\n(Stereo Out)] as Speakers <<$output_devices>> #lightgreen
     [🔄\nRotary\nEncoder\n(Volume)] as Knob <<$input_devices>> #lightsalmon
     [⏭️\nSkip\nButton] as Button <<$input_devices>> #lightsalmon
 }
- 
+
 rectangle "Hardware Layer" as HW #d0e0ff {
     [📡\nDAB+ SDR\n(USB Dongle)] as SDR <<$hardware>> #lightblue
     [🍓\nRaspberry Pi\n(Running Buster)] as Pi <<$microchip>> #mistyrose
 }
- 
+
 ' --- Defining Software Processes (The Fun Stuff) ---
 rectangle "Software: The Team" as SW #fff {
- 
+
     package "The Interface" as PackageGUI #white {
         [📺\nGUI App\n(The Face)] as GUI <<(P,#ADD8E6)>> #powderblue
     }
- 
+
     package "The Drivers" as PackageDrivers #white {
         [🎧\nSystem Daemon\n(The Muscle)] as System <<(P,#ADD8E6)>> #lightcyan
         [🛠️\nHardware Daemon\n(The Tinkerer)] as HWDae <<(P,#ADD8E6)>> #moccasin
     }
- 
+
     package "The Radio" as PackageRadio #white {
         [📻\nDAB-Tuner\n(The Ear)] as Tuner <<(P,#ADD8E6)>> #lavender
         [🎼\nFFPlay\n(The Voice)] as FFplay <<(P,#ADD8E6)>> #lemonchiffon
     }
 }
- 
+
 ' --- Communication Nodes ---
 queue "The Chat Room\n(MQTT Broker/Mosquitto)" as MQTT <<$network>> #lightgray
- 
+
 () "/tmp/dab_pipe\n(Named Pipe)" as FIFO <<$folder>> #orange
- 
+
 ' --- Interconnections & Action Flows ---
- 
+
 ' 1. Output Path (The Main Event)
 SDR -[#gray,thickness=2]-> Tuner : (Raw I/Q via USB)
 Tuner -[#orange,dashed,bold,thickness=3]-> FIFO : (AAC Stream)
 FIFO -[#orange,dashed,bold,thickness=3]-> FFplay : (Decode)
 FFplay -[#green,thickness=2]-> System : (Digital Audio)
 System -[#green,bold,thickness=2]-> Speakers : (Analog Audio via ALSA)
- 
+
 ' 2. Input Path (Volume & Skip)
 Knob -[#salmon,thickness=2]-> HWDae : (Encoder Clicks)
 Button -[#salmon,thickness=2]-> HWDae : (Button Press)
 HWDae -[#blue,bold,thickness=2]-> MQTT : [Publish]\ncmnd/volume/delta\ncmnd/radio/skip
- 
+
 ' 3. Control Loops (The Brain)
 ' Volume
 MQTT -[#red,thickness=2]-> System : [Subscribe]\ncmnd/volume/set
 System -[#green,thickness=2]-> System : (Internal logic: call amixer)
 System -[#blue,thickness=2]-> MQTT : [Publish]\nstat/volume/actual
- 
+
 ' Tune/Skip
 MQTT -[#red,thickness=2]-> Tuner : [Subscribe]\ncmnd/radio/skip\ncmnd/radio/tune_id
 Tuner -[#blue,thickness=2]-> MQTT : [Publish]\nstat/radio/info (Name/Text)
- 
+
 ' 4. The GUI (Observation & Control)
 GUI -[#blue,thickness=2]-> MQTT : [Publish]\ncmnd/radio/tune_id
 MQTT -[#red,thickness=2]-> GUI : [Subscribe]\nstat/radio/info\nstat/volume/actual
- 
+
 ' Optional Connection: GUI spawning FFplay
 GUI ..> FFplay : (Spawn process)
- 
+
 ' --- Legend/Notes (Fun Icons) ---
 note top of MQTT #white
   ⚡️ **Asynchronous Control**
   *(Loosely coupled, fast)*
 end note
- 
+
 note top of FIFO #white
   **High-Speed Audio Flow**
   *(Synchronous, continuous)*
 end note
 ```
+
 </details>
 
+## The wrong screens
 
+| option                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | brigtness                    | enclosude | price |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- | --------- | ----- |
+| ![alt text](images/display-y.png) ![ ](images/MPI1008.png) 10.1 inch 1280x800 IPS MPI1008 http://www.lcdwiki.com/10.1inch_HDMI_Display-Y                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | 220cd/m2 button addjustment  | plastic   | ~£50  |
+| ![ ](10.1 Inch 1280\*800 TFT EJ101IA-01G HD LCD Display Touch Screen Remote Driver Board 2AV VGA For Raspberry Pi 3 [AliEpress](https://www.aliexpress.com/item/32920662451.html?spm=a2g0o.productlist.main.5.493a753ezUSlru&algo_pvid=bfda887a-1491-4815-ba0a-dcd24c721d4c&algo_exp_id=bfda887a-1491-4815-ba0a-dcd24c721d4c-4&pdp_ext_f=%7B%22order%22%3A%2217%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21GBP%2158.30%2140.81%21%21%2174.88%2152.41%21%40211b612517753430462841646e6a3c%2112000042152825609%21sea%21UK%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3A72912a7b%3Bm03_new_user%3A-29895%3BpisId%3A5000000197842856&curPageLogUid=T1BA53JcnbQe&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32920662451%7C_p_origin_prod%3A)                         | 350 cd/m2                    | none      | ~£50  |
+| ![ ](images/EJ101IA-01G.png) 10.1 Inch 1280\*800 TFT EJ101IA-01G HD LCD Display Touch Screen Remote Driver Board 2AV VGA For Raspberry Pi 3 [AliEpress](https://www.aliexpress.com/item/32920662451.html?spm=a2g0o.productlist.main.5.493a753ezUSlru&algo_pvid=bfda887a-1491-4815-ba0a-dcd24c721d4c&algo_exp_id=bfda887a-1491-4815-ba0a-dcd24c721d4c-4&pdp_ext_f=%7B%22order%22%3A%2217%22%2C%22eval%22%3A%221%22%2C%22fromPage%22%3A%22search%22%7D&pdp_npi=6%40dis%21GBP%2158.30%2140.81%21%21%2174.88%2152.41%21%40211b612517753430462841646e6a3c%2112000042152825609%21sea%21UK%210%21ABX%211%210%21n_tag%3A-29910%3Bd%3A72912a7b%3Bm03_new_user%3A-29895%3BpisId%3A5000000197842856&curPageLogUid=T1BA53JcnbQe&utparam-url=scene%3Asearch%7Cquery_from%3A%7Cx_object_id%3A32920662451%7C_p_origin_prod%3A) | 350 cd/m2                    | none      | ~£50  |
+| ![alt text](images/ROADOM.png) ROADOM Touch Screen with Case, 10.1’’ Raspberry Pi Screen, IPS FHD 1024×600,Responsive and Smooth Touch,Dual Built-in Speakers,HDMI Input,Compatible with Raspberry Pi 5/4/3/Zero [Amazon](https://www.amazon.co.uk/ROADOM-Raspberry-1024%C3%97600-Responsive-Compatible/dp/B0DPW4KDR8/ref=asc_df_B0DPW4KDR8?mcid=8b5602a71926328baf9a6775c58ac75d&tag=googshopuk-21&linkCode=df0&hvadid=732381739151&hvpos=&hvnetw=g&hvrand=12352195671574543887&hvpone=&hvptwo=&hvqmt=&hvdev=c&hvdvcmdl=&hvlocint=&hvlocphy=9045980&hvtargid=pla-2402559317518&hvocijid=12352195671574543887-B0DPW4KDR8-&hvexpln=0&gad_source=1&th=1)                                                                                                                                                          |                              | plastic   | £69   |
+| ![alt text](images/display-s.png) 10.1 inch 1280x800 Capacitive Touch Screen. Connections on side. NOT SUITABLE https://www.lcdwiki.com/10.1inch_HDMI_Display-S                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | 250 cd/m2 rotarty adjusrment | metal     |       |
