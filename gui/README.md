@@ -27,7 +27,7 @@ just a simple getting started
 - Fullscreen mode: `python test2.py --fullscreen` — press Escape to exit
 - Uses Kivy `RoundedRectangle` and `Clock.schedule_once` for thread-safe MQTT updates
 
-![alt text](../images/kivy-test2.png.png)
+![alt text](../images/kivy-test2.png)
 
 
 
