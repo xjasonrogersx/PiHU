@@ -58,13 +58,39 @@ Topics
 | car/speed                 |                                                   |
 | car/HU/bg_image           | index of backgrond image to display - for testing |
 | car/HU/volume             | 0% - 100% volume                                  |
-| car/dab/set_station       | request a station <frequency subchannel bitrate>  |
-| car/dab/frequency         | current                                           |
-| car/dab/subchannel        | current                                           |
-| car/dab/bitrate           | current                                           |
-| car/dab/programme_type    | current                                           |
-| car/dab/programme_service | current                                           |
-| car/dab/ensemble          | current                                           |
+| car/dab/tune_to           | tune_to message sent from GUI to tunner           |
+| car/dab/current_programme | published by tuner                                |
+| car/deb/seek              | sent from GUI to tunner  { "seek":"up" } or { "seek":"down" }      |
+
+
+
+tune_to messgae:
+```
+{
+    "frequency":1234,
+    "subchannel":1,
+    "bitrate":64,
+}
+```
+
+
+current_programme message:
+```
+{
+  "frequency": 230640,
+  "service": {
+    "label": "BBC 6 Music", 
+    "short_label": "BBC 6M"},
+  "type": "music",
+  "ensemble": "London N",
+  "bitrate": 128,
+  "dab_plus": 1
+}
+
+```
+
+
+
 
 ## How to install mosquito
 

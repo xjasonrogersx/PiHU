@@ -41,6 +41,38 @@ just a simple getting started
 
 
 
+### test3
+
+DAB Radio GUI with station display, logos, and controls.
+
+**Features:**
+- Subscribes to `car/dab/current_programme` MQTT topic
+- Displays station logo (128x128) from `images/RadioStationLogos/RadioStationLogos_128x128_2026-04-08/`
+- Shows station metadata:
+  - Station label (large, bold)
+  - Genre/type
+  - Ensemble (network)
+  - Bitrate (kbps) and DAB/DAB+ status
+- **Seek/Skip button** publishes to `car/dab/seek` topic
+- Fullscreen mode: `python test3.py --fullscreen` — press Escape to exit
+- Background image switchable with keys `1`/`2`/`3`
+- Thread-safe MQTT updates via Kivy `Clock.schedule_once`
+
+**Test with:**
+
+```bash
+mosquitto_pub -h localhost -t car/dab/current_programme -m '{"frequency":230640,"subchannel":0,"bitrate":128,"sid":"0xC1D0","type":"Commercial Pop","service":{"label":"Absolute Radio","short_label":"Absolute","image":""},"ensemble":"London N","dab_plus":1}'
+```
+
+Or BBC 6 Music:
+
+```bash
+mosquitto_pub -h localhost -t car/dab/current_programme -m '{"frequency":225648,"subchannel":1,"bitrate":96,"sid":"0xC1C2","type":"Music","service":{"label":"BBC 6 Music","short_label":"BBC 6M"},"ensemble":"London N","dab_plus":1}'
+```
+
+**Logo matching:** GUI looks up station logos by converting the station label (spaces to dashes). Example: "BBC 6 Music" → `BBC-6-Music.png`
+
+
 
 
 ## TKInter
