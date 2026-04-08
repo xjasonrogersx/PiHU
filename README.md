@@ -60,6 +60,7 @@ Topics
 | car/HU/volume             | 0% - 100% volume                                  |
 | car/dab/tune_to           | tune_to message sent from GUI to tunner           |
 | car/dab/current_programme | published by tuner                                |
+| car/dab/now_plating       | published by tuner                                |
 | car/deb/seek              | sent from GUI to tunner  { "seek":"up" } or { "seek":"down" }      |
 
 
@@ -85,6 +86,14 @@ current_programme message:
   "ensemble": "London N",
   "bitrate": 128,
   "dab_plus": 1
+}
+
+```
+
+now_plating message:
+```
+{
+    "todo"
 }
 
 ```
