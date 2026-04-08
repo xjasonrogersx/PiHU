@@ -28,8 +28,8 @@ import paho.mqtt.client as mqtt
 
 image_list = [
     '../../images/1775206919136.png',  # car right
-    '../../PiHU/images/1775206081435.png',  # car middle
-    '../../PiHU/images/1775205902337.png',  # PiHU logo
+    '../../images/1775206081435.png',  # car middle
+    '../../images/1775205902337.png',  # PiHU logo
 ]
 
 mqtt_broker = "localhost"
