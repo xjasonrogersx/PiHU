@@ -23,6 +23,8 @@ from kivy.uix.button import Button
 from kivy.graphics import Color, RoundedRectangle
 from kivy.core.window import Window
 from kivy.clock import Clock
+from kivy.core.text import LabelBase
+
 import paho.mqtt.client as mqtt
 
 
@@ -47,6 +49,12 @@ mqtt_topic_bg = "car/HU/bg_image"
 class OverlayWindow(FloatLayout):
     def __init__(self, **kwargs):
         super(OverlayWindow, self).__init__(**kwargs)
+
+        #
+        # register the font (adjust path if you put the .ttf elsewhere)
+        LabelBase.register(name='Montserrat',
+                        fn_regular='/home/jason/work/PiHU/gui/kivy-test/Montserrat/static/Montserrat-SemiBold.ttf')
+
 
         # Background image
         self.bg_image = Image(
@@ -85,6 +93,7 @@ class OverlayWindow(FloatLayout):
         # Station label (large)
         self.station_label = Label(
             text="No Station",
+            font_name='Montserrat',
             font_size='20sp',
             bold=True,
             color=(1, 1, 1, 1),
@@ -98,6 +107,7 @@ class OverlayWindow(FloatLayout):
         # Station type/genre
         self.station_type = Label(
             text="Type: --",
+            font_name='Montserrat',
             font_size='14sp',
             color=(1, 1, 0, 1),
             halign='center',
@@ -109,6 +119,7 @@ class OverlayWindow(FloatLayout):
         # Ensemble name
         self.ensemble_label = Label(
             text="Ensemble: --",
+            font_name='Montserrat',
             font_size='12sp',
             color=(0.8, 0.8, 0.8, 1),
             halign='center',
@@ -120,6 +131,7 @@ class OverlayWindow(FloatLayout):
         # Bitrate and DAB+ status
         self.bitrate_label = Label(
             text="Bitrate: -- | DAB: --",
+            font_name='Montserrat',
             font_size='12sp',
             color=(0.8, 0.8, 0.8, 1),
             halign='center',
@@ -131,6 +143,7 @@ class OverlayWindow(FloatLayout):
         # Seek button
         self.seek_button = Button(
             text='⏭️ SEEK',
+            font_name='Montserrat',
             font_size='16sp',
             size_hint=(0.8, 0.12),
             pos_hint={'center_x': 0.5, 'top': 0.22},
