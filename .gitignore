@@ -1,4 +1,3 @@
 tools/uml4md/plantuml-mit-1.2024.7.jar
-images/RadioStationLogos/RadioStationLogos_128x128.zip
-images/RadioStationLogos/RadioStationLogos_128x128_2026-04-08/*.*
-
+images/RadioStationLogos/*.png
+images/RadioStationLogos/*.jpg

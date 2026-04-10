@@ -53,19 +53,18 @@ Why have seperate Apps and communicte between them with MQTT.
 
 Topics
 
-| topic                     | description                                       |
-| ------------------------- | ------------------------------------------------- |
-| car/speed                 |                                                   |
-| car/HU/bg_image           | index of backgrond image to display - for testing |
-| car/HU/volume             | 0% - 100% volume                                  |
-| car/dab/tune_to           | tune_to message sent from GUI to tunner           |
-| car/dab/current_programme | published by tuner                                |
-| car/dab/now_plating       | published by tuner                                |
-| car/deb/seek              | sent from GUI to tunner  { "seek":"up" } or { "seek":"down" }      |
-
-
+| topic                     | description                                                  |
+| ------------------------- | ------------------------------------------------------------ |
+| car/speed                 |                                                              |
+| car/HU/bg_image           | index of backgrond image to display - for testing            |
+| car/HU/volume             | 0% - 100% volume                                             |
+| car/dab/tune_to           | tune_to message sent from GUI to tunner                      |
+| car/dab/current_programme | published by tuner                                           |
+| car/dab/now_plating       | published by tuner                                           |
+| car/deb/seek              | sent from GUI to tunner { "seek":"up" } or { "seek":"down" } |
 
 tune_to messgae:
+
 ```
 {
     "frequency":1234,
@@ -74,13 +73,13 @@ tune_to messgae:
 }
 ```
 
-
 current_programme message:
+
 ```
 {
   "frequency": 230640,
   "service": {
-    "label": "BBC 6 Music", 
+    "label": "BBC 6 Music",
     "short_label": "BBC 6M"},
   "type": "music",
   "ensemble": "London N",
@@ -91,15 +90,13 @@ current_programme message:
 ```
 
 now_plating message:
+
 ```
 {
     "todo"
 }
 
 ```
-
-
-
 
 ## How to install mosquito
 
@@ -142,7 +139,7 @@ installations
 
 This is my current Cheap Chinese android head unit which I got on ebay for £46
 
-![alt text](images/what-i-have.png.png)
+![alt text](images/what-i-have.png)
 
 - 1024x600
 
