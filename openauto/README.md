@@ -113,7 +113,7 @@ apt install -y \
 
 ```
 
-## protobuf
+## step 2 protobuf
 
 Build the specific version of protobuf that is , apparenty required
 
@@ -138,14 +138,13 @@ make install
 ldconfig
 ```
 
-## abseil
+## Step 3 abseil
 
 ```
 cd /usr/src
 git clone https://github.com/abseil/abseil-cpp.git
 cd abseil-cpp
-git checkout 20210324.2mkdir build && cd build
-
+git checkout 20210324.2
 mkdir build && cd build
 
 cmake .. \
@@ -162,17 +161,29 @@ ldconfig
 
 ```
 
-## AASDK
+## Step 4 AASDK
 
-Note, the main branch here https://github.com/opencardev is old and a `newdev` branch exists. I have cloned the main and used copilot to get it to build ( however, I still need to find a)
+Note, my `main` branch from https://github.com/xjasonrogersx/aasdk.git is based on main at https://github.com/opencardev. It is old and a `newdev` branch exists.
+
+In this armhf buster chroot, this only configured after two changes:
+
+1. Explicitly set all Boost component library paths in the CMake command.
+2. Patch `/usr/share/cmake-3.16/Modules/CMakeCompilerIdDetection.cmake` because CMake 3.16 can call `list(REMOVE_ITEM ...)` with an empty list in this environment.
 
 ```
-git clone https://github.
-./build.shcom/xjasonrogersx/aasdk.git
+git clone https://github.com/xjasonrogersx/aasdk.git
 cd aasdk
 mkdir build; cd build
 
-./build.sh
+# Backup and patch the CMake 3.16 module in the chroot.
+cp /usr/share/cmake-3.16/Modules/CMakeCompilerIdDetection.cmake \
+  /usr/share/cmake-3.16/Modules/CMakeCompilerIdDetection.cmake.bak
+
+perl -0777 -i -pe 's/list\(REMOVE_ITEM lang_files \$\{nonlang_files\}\)/if(nonlang_files)\n  list(REMOVE_ITEM lang_files \$\{nonlang_files\})\nendif()/g' \
+  /usr/share/cmake-3.16/Modules/CMakeCompilerIdDetection.cmake
+
+rm -rf CMakeCache.txt CMakeFiles
+
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
@@ -180,35 +191,44 @@ cmake .. \
   -DCMAKE_PREFIX_PATH="/usr/local;/usr" \
   -DCMAKE_C_COMPILER=/usr/bin/gcc \
   -DCMAKE_CXX_COMPILER=/usr/bin/g++ \
-  -Dabsl_DIR=/usr/local/lib/cmake/absl \
   -DProtobuf_PROTOC_EXECUTABLE=/usr/local/bin/protoc \
   -DProtobuf_INCLUDE_DIR=/usr/local/include \
   -DProtobuf_LIBRARY=/usr/local/lib/libprotobuf.a \
-  -DBoost_SYSTEM_LIBRARY=/usr/lib/arm-linux-gnueabihf/libboost_system.so \
-  -DBoost_LOG_LIBRARY=/usr/lib/arm-linux-gnueabihf/libboost_log.so \
-  -DBoost_LOG_SETUP_LIBRARY=/usr/lib/arm-linux-gnueabihf/libboost_log_setup.so \
   -DLIBUSB_1_INCLUDE_DIR=/usr/include/libusb-1.0 \
   -DLIBUSB_1_LIBRARY=/usr/lib/arm-linux-gnueabihf/libusb-1.0.so \
--DOPENSSL_ROOT_DIR=/usr \
--DOPENSSL_INCLUDE_DIR=/usr/include \
--DOPENSSL_SSL_LIBRARY=/usr/lib/arm-linux-gnueabihf/libssl.so \
--DOPENSSL_CRYPTO_LIBRARY=/usr/lib/arm-linux-gnueabihf/libcrypto.so
+  -DOPENSSL_ROOT_DIR=/usr \
+  -DOPENSSL_INCLUDE_DIR=/usr/include \
+  -DOPENSSL_SSL_LIBRARY=/usr/lib/arm-linux-gnueabihf/libssl.so \
+  -DOPENSSL_CRYPTO_LIBRARY=/usr/lib/arm-linux-gnueabihf/libcrypto.so \
+  -DBoost_NO_BOOST_CMAKE=ON \
+  -DBOOST_ROOT=/usr \
+  -DBOOST_INCLUDEDIR=/usr/include \
+  -DBOOST_LIBRARYDIR=/usr/lib/arm-linux-gnueabihf \
+  -DBoost_SYSTEM_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_system.so \
+  -DBoost_LOG_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_log.so \
+  -DBoost_LOG_SETUP_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_log_setup.so \
+  -DBoost_DATE_TIME_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_date_time.so \
+  -DBoost_FILESYSTEM_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_filesystem.so \
+  -DBoost_THREAD_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_thread.so \
+  -DBoost_REGEX_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_regex.so \
+  -DBoost_CHRONO_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_chrono.so \
+  -DBoost_ATOMIC_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_atomic.so \
+  -DBoost_UNIT_TEST_FRAMEWORK_LIBRARY_RELEASE=/usr/lib/arm-linux-gnueabihf/libboost_unit_test_framework.so
+
+make -j4
+make install
+ldconfig
+
+# Optional: restore stock module after build
+# cp /usr/share/cmake-3.16/Modules/CMakeCompilerIdDetection.cmake.bak \
+#   /usr/share/cmake-3.16/Modules/CMakeCompilerIdDetection.cmake
 ```
+
+## OpenAuto
+
+I need to find a version that builds with my branch of AASdk
 
 trying https://github.com/opencardev/openauto
-
-```
-git clone https://github.com/abseil/abseil-cpp.git
-cd abseil-cpp
-git checkout 20210324.2
-mkdir build && cd build
-cmake .. \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_POSITION_INDEPENDENT_CODE=ON
-make -j$(nproc)
-make install
-
-```
 
 ```
 root@LXP-J-ROGERS2:/home/pi# git clone https://github.com/opencardev/openauto.git
