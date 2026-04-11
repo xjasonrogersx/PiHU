@@ -4,11 +4,9 @@ I have not yet managed to build this.
 
 # Building for armhf On Intel Laptop
 
-
 This uses qemu-arm-static and chroot
 
 download from https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28/
-
 
 ```
 wget https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2021-05-28/2021-05-07-raspios-buster-armhf-lite.zip
@@ -24,7 +22,7 @@ sudo losetup --find --partscan --show 2021-05-07-raspios-buster-armhf-lite.img
 
 sudo parted /dev/loop27
 
-## print 
+## print
 ## resizepart 2 100%
 ## quit
 
@@ -49,12 +47,6 @@ sudo mount --bind /etc/resolv.conf rootfs/etc/resolv.conf
 sudo chroot rootfs /bin/bash
 ```
 
-
-
-
-
-
-
 ```
 ## Attach the loop device with partitions
 sudo losetup --find --partscan --show 2021-05-07-raspios-buster-armhf-lite.img
@@ -68,7 +60,6 @@ sudo mount --bind /etc/resolv.conf rootfs/etc/resolv.conf
 sudo chroot rootfs /bin/bash
 ```
 
-
 ```
 root@LXP-J-ROGERS2:/# uname -m
 armv7l
@@ -80,10 +71,10 @@ Try and update and fails as expected
 root@LXP-J-ROGERS2:/# apt update
 Ign:1 http://raspbian.raspberrypi.org/raspbian buster InRelease
 Get:2 http://archive.raspberrypi.org/debian buster InRelease [54.2 kB]
-Err:3 http://raspbian.raspberrypi.org/raspbian buster Release                                
+Err:3 http://raspbian.raspberrypi.org/raspbian buster Release
   404  Not Found [IP: 93.93.128.193 80]
-Get:4 http://archive.raspberrypi.org/debian buster/main armhf Packages [400 kB]              
-Reading package lists... Done     
+Get:4 http://archive.raspberrypi.org/debian buster/main armhf Packages [400 kB]
+Reading package lists... Done
 E: The repository 'http://raspbian.raspberrypi.org/raspbian buster Release' no longer has a Release file.
 N: Updating from such a repository can't be done securely, and is therefore disabled by default.
 N: See apt-secure(8) manpage for repository creation and user configuration details.
@@ -91,13 +82,14 @@ N: Repository 'http://archive.raspberrypi.org/debian buster InRelease' changed i
 
 ```
 
-
 ```
 nano /etc/apt/sources.list
 ```
+
 change to
+
 ```
-deb http://legacy.raspbian.org/raspbian buster main contrib non-free rpi 
+deb http://legacy.raspbian.org/raspbian buster main contrib non-free rpi
 ```
 
 ## Updates
@@ -109,17 +101,21 @@ apt install -y \
   git \
   libboost-all-dev \
   libusb-1.0-0-dev \
-  libprotobuf-dev \
-  protobuf-compiler \
   libasound2-dev \
   libgl1-mesa-dev \
   libglew-dev \
   libegl1-mesa-dev \
-  mesa-common-dev
+  mesa-common-dev \
+  zlib1g-dev \
+   pkg-config \
+    libc6-dev
+
+
 ```
-  
-  
+
 ## protobuf
+
+Build the specific version of protobuf that is , apparenty required
 
 ```
 cd /usr/src
@@ -134,64 +130,49 @@ cd protobuf-21.12
 
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
-  -Dprotobuf_BUILD_SHARED_LIBS=ON \
-  -Dprotobuf_BUILD_TESTS=O
-
-
-
-
+  -Dprotobuf_BUILD_SHARED_LIBS=OFF \
+  -Dprotobuf_BUILD_TESTS=OFF
 
 make -j4
 make install
 ldconfig
+```
 
-```  
-  
-  
-  
-  
 ## abseil
-  
-  
-  ```
-  cd /usr/src
+
+```
+cd /usr/src
 git clone https://github.com/abseil/abseil-cpp.git
 cd abseil-cpp
-git checkout 20210324.2
-```
-
-```
-export CC=/usr/bin/gcc
-export CXX=/usr/bin/g++
-export CMAKE_C_COMPILER=/usr/bin/gcc
-export CMAKE_CXX_COMPILER=/usr/bin/g++
+git checkout 20210324.2mkdir build && cd build
 
 mkdir build && cd build
+
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=/usr/local \
-  -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
   -DABSL_ENABLE_INSTALL=ON \
-  -DCMAKE_CXX_COMPILER_WORKS=ON \
-  -DCMAKE_C_COMPILER_WORKS=ON \
-  -DABSL_USE_SYSTEM_INCLUDES=ON
-  
-  
+  -DABSL_PROPAGATE_CXX_STD=ON \
+  -DCMAKE_CXX_STANDARD=14
+
+## For me it fails but then run cmake again..
+
 make install
+ldconfig
+
 ```
 
-  
-  
-  
-## AA  
-  
+## AASDK
+
+Note, the main branch here https://github.com/opencardev is old and a `newdev` branch exists. I have cloned the main and used copilot to get it to build ( however, I still need to find a)
+
 ```
-git clone https://github.com/opencardev/aasdk.git
-cd https://github.com/opencardev/aasdk.git
+git clone https://github.
+./build.shcom/xjasonrogersx/aasdk.git
+cd aasdk
+mkdir build; cd build
+
 ./build.sh
-
-
-
 cmake .. \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
@@ -213,15 +194,8 @@ cmake .. \
 -DOPENSSL_SSL_LIBRARY=/usr/lib/arm-linux-gnueabihf/libssl.so \
 -DOPENSSL_CRYPTO_LIBRARY=/usr/lib/arm-linux-gnueabihf/libcrypto.so
 ```
-  
-  
-  
-  
-  
-  
-  
-trying https://github.com/opencardev/openauto
 
+trying https://github.com/opencardev/openauto
 
 ```
 git clone https://github.com/abseil/abseil-cpp.git
@@ -236,7 +210,6 @@ make install
 
 ```
 
-
 ```
 root@LXP-J-ROGERS2:/home/pi# git clone https://github.com/opencardev/openauto.git
 Cloning into 'openauto'...
@@ -248,19 +221,12 @@ Receiving objects: 100% (5323/5323), 4.12 MiB | 14.71 MiB/s, done.
 Resolving deltas: 100% (3043/3043), done.
 
 
-```  
-  
-  
-  
-  
-  
+```
+
 ## Shutdown
-  
 
 ```
 exit
 sudo umount ./rootfs
 sudo losetup -d /dev/loop28
 ```
-  
-  
