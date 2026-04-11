@@ -127,10 +127,19 @@ curl -LO https://github.com/protocolbuffers/protobuf/releases/download/v21.12/pr
 tar xf protobuf-all-21.12.tar.gz
 cd protobuf-21.12
 
-./configure \
-  --prefix=/usr/local \
-  --disable-shared \
-  --enable-static
+#./configure \
+#  --prefix=/usr/local \
+#  --disable-shared \
+#  --enable-static
+
+cmake .. \
+  -DCMAKE_BUILD_TYPE=Release \
+  -Dprotobuf_BUILD_SHARED_LIBS=ON \
+  -Dprotobuf_BUILD_TESTS=O
+
+
+
+
 
 make -j4
 make install
