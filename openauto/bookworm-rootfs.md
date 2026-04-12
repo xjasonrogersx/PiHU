@@ -8,7 +8,7 @@ truncate -s +10G 2025-11-24-raspios-bookworm-armhf-lite.img
 ## Attach the loop device with partitions
 sudo losetup --find --partscan --show 2025-11-24-raspios-bookworm-armhf-lite.img
 
-sudo sudo parted /dev/loop35 resizepart 2 100%
+sudo parted /dev/loop35 resizepart 2 100%
 
 ## My laptop is Ubuntu22 and the following does not work
 ## sudo e2fsck -f /dev/loop35p2
