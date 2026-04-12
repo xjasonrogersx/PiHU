@@ -3,7 +3,7 @@
 Setting up the image
 
 ```
-truncate -s +10G 2025-11-24-raspios-bookworm-armhf-lite.img
+truncate -s +10G  2025-11-24-raspios-bookworm-arm64-lite.img
 
 ## Attach the loop device with partitions
 sudo losetup --find --partscan --show 2025-11-24-raspios-bookworm-armhf-lite.img
