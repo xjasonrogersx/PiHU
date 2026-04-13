@@ -259,3 +259,76 @@ end note
 ```
 
 </details>
+
+
+
+
+
+---
+
+sudo apt install -y pipewire pipewire-pulse wireplumber alsa-utils ffmpeg
+
+systemctl --user enable --now pipewire pipewire-pulse wireplumber
+
+
+## Audio on headphone
+
+wpctl set-mute @DEFAULT_AUDIO_SINK@ 0
+wpctl set-volume @DEFAULT_AUDIO_SINK@ 1.0
+ffplay -nodisp -autoexit sample-3s.mp3
+
+
+
+
+# Headphone sink node from your earlier output:
+pw-metadata -n settings 0 default.audio.sink '{"name":"alsa_output.platform-fef00700.hdmi.analog-stereo"}'
+
+# make sure it is unmuted and loud
+wpctl set-mute 69 0
+wpctl set-volume 69 1.0
+
+# test
+ffplay -nodisp -autoexit sample-3s.mp3
+
+
+
+
+--
+
+NOPI_FLAG="-DNOPI=OFF"
+
+Important caveat for Bookworm:
+The legacy OMX/VideoCore stack (mmal, openmaxil, ilclient) is deprecated on Bookworm and the Pi 4/5. The firmware ships it for compatibility but it is no longer the primary video path. If libraspberrypi-dev installs cleanly and /opt/vc is populated, your build with NOPI=OFF will compile — but at runtime OMX video output may not work properly on Bookworm's KMS/DRM display stack.
+
+If video output ends up broken at runtime, the practical fix is to keep NOPI=ON (which skips OMX entirely and uses the Qt/V4L2 path instead). Let me know which way you want to go.
+
+	sudo apt install -y libraspberrypi-dev libraspberrypi0
+	
+	
+	---------
+	
+	
+	# Install hardware V4L2 codec plugin
+sudo apt install -y \
+    gstreamer1.0-tools \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav \
+    gstreamer1.0-alsa \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libqt5multimedia5-plugins \
+    qtmultimedia5-dev
+
+# Verify V4L2 codec device exists
+ls /dev/video{10,11,12}
+
+# Check GStreamer can see the hardware decoder
+gst-inspect-1.0 v4l2h264dec
+	
+	
+	
+	
+
+
