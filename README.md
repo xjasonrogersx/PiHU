@@ -141,11 +141,12 @@ This is my current Cheap Chinese android head unit which I got on ebay for £46
 
 CPU comparison (focused on common in-market variants):
 
-| Platform                 | SoC              | CPU                     | Cores       | Clock               | ISA              | Notes                                                                                          |
-| ------------------------ | ---------------- | ----------------------- | ----------- | ------------------- | ---------------- | ---------------------------------------------------------------------------------------------- |
-| Raspberry Pi 3 (Model B) | Broadcom BCM2837 | ARM Cortex-A53          | 4           | 1.2 GHz             | ARMv8-A (64-bit) | Lower single-core performance, but efficient and widely supported.                             |
-| Raspberry Pi 4 (Model B) | Broadcom BCM2711 | ARM Cortex-A72          | 4           | 1.5 GHz             | ARMv8-A (64-bit) | Significant IPC uplift over Pi 3; much better for UI + background services.                    |
-| MediaTek AC8227L         | AC8227L          | ARM Cortex-A7 (typical) | 4 (typical) | ~1.12 GHz (typical) | ARMv7-A (32-bit) | Common in low-cost Android head units; exact CPU bin/config can vary by vendor board/firmware. |
+| Platform                 | SoC              | CPU                     | Cores       | Clock               | ISA              | Notes                                                                                            |
+| ------------------------ | ---------------- | ----------------------- | ----------- | ------------------- | ---------------- | ------------------------------------------------------------------------------------------------ |
+| Raspberry Pi 3 (Model B) | Broadcom BCM2837 | ARM Cortex-A53          | 4           | 1.2 GHz             | ARMv8-A (64-bit) | Lower single-core performance, but efficient and widely supported.                               |
+| Raspberry Pi 4 (Model B) | Broadcom BCM2711 | ARM Cortex-A72          | 4           | 1.5 GHz             | ARMv8-A (64-bit) | Significant IPC uplift over Pi 3; much better for UI + background services.                      |
+| MediaTek AC8227L         | AC8227L          | ARM Cortex-A7 (typical) | 4 (typical) | ~1.12 GHz (typical) | ARMv7-A (32-bit) | Common in low-cost Android head units; exact CPU bin/config can vary by vendor board/firmware.   |
+| RK3368 (Geekbox)         | Rockchip RK3368  | ARM Cortex-A53          | 8           | up to 1.5 GHz       | ARMv8-A (64-bit) | Octa-core A53 SoC used in some Android TV/head-unit class devices; stronger multicore than Pi 3. |
 
 ## Hardware
 
