@@ -1,11 +1,9 @@
 #
 
-
-
 Setting up the image and resize the image - One time
 
 ```
-truncate -s +10G  2025-11-24-raspios-bookworm-arm64-lite.img
+truncate -s +10G  2025-11-24-raspios-bookworm-armhf-lite.img
 
 ## Attach the loop device with partitions
 sudo losetup --find --partscan --show 2025-11-24-raspios-bookworm-arm64-lite.img
@@ -23,6 +21,7 @@ bash -c "apt update && apt install -y e2fsprogs && e2fsck -f -y /dev/loop35p2 &&
 ```
 
 This is my script to remount the rootfs
+
 ```
 export LOOPID=`sudo losetup --find --partscan --show 2025-11-24-raspios-bookworm-armhf-lite.img`
 echo "Loop device: $LOOPID"
@@ -56,3 +55,5 @@ cd openauto
 ./build.sh release --package --with-aasdk
 
 ```
+
+python -m http.server 8000

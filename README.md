@@ -21,7 +21,7 @@ Make some requirments
 - Simple fun GUI
 - Supports OpenAuto Somehow
 - Supports Dab Radio
-- Using Buster ( becuase apparently this is what OpenAuto requires )
+- Using Bookwork
 
 # GUI Mockup
 
@@ -123,17 +123,21 @@ mosquitto_pub -h localhost -t car/speed -m "60"
 
 ## OpenAuto
 
-So this is the nightmare bit. I have tried and fails multiple times to install and build OpenAuto.
+So this is the nightmare bit. I have tried and fails multiple times to install and build OpenAuto. The requirment for Buster was a lie.
 
-https://github.com/opencardev/openauto
+I was folowing old and outdated instructions. I was unable to build on the pi itself, not could I compile on my personal laptop with qmu, but I was able to on my work laptop.
 
-Crankshaft did work, but its not quite what I want.
+Current feeling is that Pi3 is too slow but it seem to be responsive on Pi4
 
-links:
+## PiComparson
 
-https://github.com/opencardev/prebuilts
+CPU comparison (focused on common in-market variants):
 
-installations
+| Platform                 | SoC              | CPU                     | Cores       | Clock              | ISA              | Notes                                                                                          |
+| ------------------------ | ---------------- | ----------------------- | ----------- | ------------------ | ---------------- | ---------------------------------------------------------------------------------------------- |
+| Raspberry Pi 3 (Model B) | Broadcom BCM2837 | ARM Cortex-A53          | 4           | 1.2 GHz            | ARMv8-A (64-bit) | Lower single-core performance, but efficient and widely supported.                             |
+| Raspberry Pi 4 (Model B) | Broadcom BCM2711 | ARM Cortex-A72          | 4           | 1.5 GHz            | ARMv8-A (64-bit) | Significant IPC uplift over Pi 3; much better for UI + background services.                    |
+| MediaTek AC8227L         | AC8227L          | ARM Cortex-A7 (typical) | 4 (typical) | ~1.3 GHz (typical) | ARMv7-A (32-bit) | Common in low-cost Android head units; exact CPU bin/config can vary by vendor board/firmware. |
 
 ## Current Android Head Unit
 
