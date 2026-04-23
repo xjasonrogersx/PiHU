@@ -51,6 +51,11 @@ Animal <|-- Dog
 ## Flow diagram / Activity diagram
 
 ![](.img/44864c242b77c1e8f6c6803f5f1f41c0.png)
+
+<details>
+<summary>View UML</summary>
+
+![](.img/44864c242b77c1e8f6c6803f5f1f41c0.png)
 <details>
 <summary>View UML</summary>
 
@@ -66,6 +71,8 @@ endif
 :Process ends;
 stop
 ```
+</details>
+
 </details>
 
 ## End
