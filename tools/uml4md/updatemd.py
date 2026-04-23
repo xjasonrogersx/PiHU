@@ -195,7 +195,8 @@ def main():
 
     plantuml_available = check_plantuml_available()
     if not plantuml_available:
-        print(f"Warning: plantuml not available - will wrap UML blocks but won't generate images", file=sys.stderr)
+        print(f"Warning: plantuml not available - skipping image generation", file=sys.stderr)
+        sys.exit(1)
 
     process_markdown(md_file, plantuml_available)
 

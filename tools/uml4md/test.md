@@ -9,15 +9,10 @@ Some introductory text.
 <details>
 <summary>View UML</summary>
 
-![](.img/077301032c23b097c6c61e5518fc5298.png)
-<details>
-<summary>View UML</summary>
-
 ```uml
 Alice -> Bob : hello
 Bob --> Alice : hi there
 ```
-</details>
 
 </details>
 
@@ -25,10 +20,6 @@ Bob --> Alice : hi there
 
 ![](.img/dc5ba55beb1d8c7342a936047bea87ea.png)
 
-<details>
-<summary>View UML</summary>
-
-![](.img/dc5ba55beb1d8c7342a936047bea87ea.png)
 <details>
 <summary>View UML</summary>
 
@@ -44,20 +35,10 @@ class Dog {
 
 Animal <|-- Dog
 ```
-</details>
 
 </details>
 
 ## Flow diagram / Activity diagram
-
-![](.img/44864c242b77c1e8f6c6803f5f1f41c0.png)
-
-<details>
-<summary>View UML</summary>
-
-![](.img/44864c242b77c1e8f6c6803f5f1f41c0.png)
-<details>
-<summary>View UML</summary>
 
 ```uml
 start
@@ -71,9 +52,6 @@ endif
 :Process ends;
 stop
 ```
-</details>
-
-</details>
 
 ## End
 
