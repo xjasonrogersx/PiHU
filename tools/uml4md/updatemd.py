@@ -67,6 +67,20 @@ def find_plantuml_cmd():
     return ['plantuml']
 
 
+def check_plantuml_available():
+    """Check if plantuml is available on the system."""
+    try:
+        cmd = find_plantuml_cmd()
+        result = subprocess.run(cmd + ['-version'], capture_output=True, text=True, timeout=5)
+        return result.returncode == 0
+    except FileNotFoundError:
+        return False
+    except subprocess.TimeoutExpired:
+        return False
+    except Exception:
+        return False
+
+
 def generate_image(uml_content, hash_val, img_dir, theme_content):
     """Write plantuml source to /tmp/<hash> and invoke plantuml to produce a PNG."""
     lines = ['@startuml']
@@ -81,13 +95,23 @@ def generate_image(uml_content, hash_val, img_dir, theme_content):
 
     os.makedirs(img_dir, exist_ok=True)
 
-    result = subprocess.run(
-        find_plantuml_cmd() + ['-tpng', '-o', img_dir, tmp_file],
-        capture_output=True, text=True
-    )
+    try:
+        result = subprocess.run(
+            find_plantuml_cmd() + ['-tpng', '-o', img_dir, tmp_file],
+            capture_output=True, text=True, timeout=30
+        )
 
-    if result.returncode != 0:
-        print(f"Warning: plantuml failed for {hash_val}:\n{result.stderr}", file=sys.stderr)
+        if result.returncode != 0:
+            print(f"Warning: plantuml failed for {hash_val}:\n{result.stderr}", file=sys.stderr)
+            return False
+    except FileNotFoundError:
+        print(f"Warning: plantuml not found - skipping image generation for {hash_val}", file=sys.stderr)
+        return False
+    except subprocess.TimeoutExpired:
+        print(f"Warning: plantuml timeout for {hash_val}", file=sys.stderr)
+        return False
+    except Exception as e:
+        print(f"Warning: error generating image for {hash_val}: {e}", file=sys.stderr)
         return False
 
     return True
@@ -119,7 +143,7 @@ _PATTERN = re.compile(
 )
 
 
-def process_markdown(md_file_path):
+def process_markdown(md_file_path, plantuml_available=True):
     with open(md_file_path, 'r') as f:
         original = f.read()
 
@@ -138,13 +162,15 @@ def process_markdown(md_file_path):
             old_img = os.path.join(img_dir, old_hash + '.png')
             if os.path.exists(old_img):
                 os.remove(old_img)
-            generate_image(uml_content, new_hash, img_dir, theme_content)
+            if plantuml_available:
+                generate_image(uml_content, new_hash, img_dir, theme_content)
             return make_block(new_hash, uml_content)
         else:
             # Raw ```uml block — wrap it
             uml_content = m.group(3)
             hash_val = md5(uml_content)
-            generate_image(uml_content, hash_val, img_dir, theme_content)
+            if plantuml_available:
+                generate_image(uml_content, hash_val, img_dir, theme_content)
             return make_block(hash_val, uml_content)
 
     updated = _PATTERN.sub(replace, original)
@@ -167,7 +193,11 @@ def main():
         print(f"Error: file not found: {md_file}", file=sys.stderr)
         sys.exit(1)
 
-    process_markdown(md_file)
+    plantuml_available = check_plantuml_available()
+    if not plantuml_available:
+        print(f"Warning: plantuml not available - will wrap UML blocks but won't generate images", file=sys.stderr)
+
+    process_markdown(md_file, plantuml_available)
 
 
 if __name__ == '__main__':
