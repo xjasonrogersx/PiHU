@@ -36,12 +36,14 @@ From the build directory:
 ./dab/dab-radio/dab_scan
 ./dab/dab-radio/dab_mp2
 ./dab/dab-radio/dab_aac
+
 ```
 
 Optional target (only built when MQTT + nlohmann_json are available):
 
 ```bash
 ./dab/dab-radio/dab_tuner_aac
+./dab/dab-radio/dab_play
 ```
 
 # Logo
