@@ -30,8 +30,44 @@ extern "C" {
 
 #include <iomanip>
 #include <iostream>
+#include <utility>
 
 #include "tools.h"
+
+namespace {
+int SamplingFrequencyIndexFromHz(int samplingRate) {
+  switch (samplingRate) {
+    case 96000:
+      return 0;
+    case 88200:
+      return 1;
+    case 64000:
+      return 2;
+    case 48000:
+      return 3;
+    case 44100:
+      return 4;
+    case 32000:
+      return 5;
+    case 24000:
+      return 6;
+    case 22050:
+      return 7;
+    case 16000:
+      return 8;
+    case 12000:
+      return 9;
+    case 11025:
+      return 10;
+    case 8000:
+      return 11;
+    case 7350:
+      return 12;
+    default:
+      return 8;
+  }
+}
+}  // namespace
 
 DabPlusServiceComponentDecoder::DabPlusServiceComponentDecoder() {}
 
@@ -55,6 +91,11 @@ void DabPlusServiceComponentDecoder::componentDataInput(
   if (m_frameSize > 0) {
     synchronizeData(frameData);
   }
+}
+
+void DabPlusServiceComponentDecoder::setLatmDataCallback(
+    LatmDataCallback callback) {
+  m_latmDataCallback = std::move(callback);
 }
 
 void DabPlusServiceComponentDecoder::synchronizeData(
@@ -378,20 +419,26 @@ void DabPlusServiceComponentDecoder::ProcessUntouchedStream(const uint8_t* data,
   au_bw.AddBits(0, 3);  // numLayer
 
   // AudioSpecificConfig() - PS signalling only implicit
-  // if(sf_format.IsSBR()) {
-  au_bw.AddBits(0b00101, 5);  // SBR
-  au_bw.AddBits(8, 4);        // samplingFrequencyIndex
-  au_bw.AddBits(1, 4);        // channelConfiguration
-  au_bw.AddBits(5, 4);        // extensionSamplingFrequencyIndex
-  au_bw.AddBits(0b00010, 5);  // AAC LC
+  const int channelConfig = m_currentSuperFrame.channels > 1 ? 2 : 1;
+  const int outputFrequencyIndex =
+      SamplingFrequencyIndexFromHz(m_currentSuperFrame.samplingRate);
+  const int coreSamplingRate =
+      m_currentSuperFrame.sbrUsed ? (m_currentSuperFrame.samplingRate / 2)
+                                  : m_currentSuperFrame.samplingRate;
+  const int coreFrequencyIndex = SamplingFrequencyIndexFromHz(coreSamplingRate);
+
+  if (m_currentSuperFrame.sbrUsed) {
+    au_bw.AddBits(0b00101, 5);  // SBR
+    au_bw.AddBits(outputFrequencyIndex, 4);
+    au_bw.AddBits(channelConfig, 4);
+    au_bw.AddBits(coreFrequencyIndex, 4);
+    au_bw.AddBits(0b00010, 5);  // AAC LC
+  } else {
+    au_bw.AddBits(0b00010, 5);  // AAC LC
+    au_bw.AddBits(outputFrequencyIndex, 4);
+    au_bw.AddBits(channelConfig, 4);
+  }
   au_bw.AddBits(0b100, 3);    // GASpecificConfig() with 960 transform
-  // } else {
-  // 	au_bw.AddBits(0b00010, 5);
-  // // AAC LC 	au_bw.AddBits(sf_format.GetCoreSrIndex(), 4);		//
-  // samplingFrequencyIndex 	au_bw.AddBits(sf_format.GetCoreChConfig(), 4);
-  // // channelConfiguration 	au_bw.AddBits(0b100, 3);
-  // // GASpecificConfig() with 960 transform
-  // }
 
   au_bw.AddBits(0b000, 3);  // frameLengthType
   au_bw.AddBits(0xFF, 8);   // latmBufferFullness
@@ -409,18 +456,23 @@ void DabPlusServiceComponentDecoder::ProcessUntouchedStream(const uint8_t* data,
   au_bw.WriteAudioMuxLengthBytes();
 
   const std::vector<uint8_t> latm_data = au_bw.GetData();
-  // ForwardUntouchedStream(&latm_data[0], latm_data.size(),
-  // sf_format.GetAULengthMs());
+  if (m_latmDataCallback) {
+    m_latmDataCallback(latm_data);
+    return;
+  }
 
-  // for (auto i: latm_data)
-  //     std::cout << i;
+  // Fallback for existing users that consume LATM via named pipe.
   static int fd = -1;
   if (fd < 0) {
     fd = open("/tmp/dab_pipe", O_WRONLY | O_NONBLOCK);
-    std::cout << "Pipe Opened\n";
+    if (fd >= 0) {
+      std::cout << "Pipe Opened\n";
+    }
   }
-  auto written = write(fd, latm_data.data(), latm_data.size());
-  std::cout << "written : " << written << "\n";
+  if (fd >= 0) {
+    auto written = write(fd, latm_data.data(), latm_data.size());
+    std::cout << "written : " << written << "\n";
+  }
 }
 
 const uint16_t DabPlusServiceComponentDecoder::FIRECODE_TABLE[256] = {

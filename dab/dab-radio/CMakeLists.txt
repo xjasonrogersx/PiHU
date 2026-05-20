@@ -7,6 +7,10 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -frtti -fexceptions")
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBUSB REQUIRED libusb-1.0)
 pkg_check_modules(MOSQUITTO libmosquitto)
+pkg_check_modules(ALSA REQUIRED alsa)
+pkg_check_modules(LIBAVCODEC REQUIRED libavcodec)
+pkg_check_modules(LIBAVUTIL REQUIRED libavutil)
+pkg_check_modules(LIBSWRESAMPLE REQUIRED libswresample)
 
 # Find nlohmann_json
 find_package(nlohmann_json QUIET)
@@ -23,7 +27,8 @@ file(GLOB SOURCES "*.cpp")
 file(GLOB FEC_SOURCES "fec/*.c")
 
 # Main executables
-set(MAINS dab_scan dab_mp2 dab_aac)
+set(ALL_MAINS dab_scan dab_mp2 dab_aac dab_play dab_tuner_aac)
+set(MAINS dab_scan dab_mp2 dab_aac dab_play)
 if(MOSQUITTO_FOUND AND (nlohmann_json_FOUND OR NLOHMANN_JSON_FOUND))
   list(APPEND MAINS dab_tuner_aac)
 endif()
@@ -32,7 +37,7 @@ endif()
 set(COMMON_SOURCES)
 foreach(source ${SOURCES})
     get_filename_component(basename ${source} NAME_WE)
-    if(NOT basename IN_LIST MAINS)
+    if(NOT basename IN_LIST ALL_MAINS)
         list(APPEND COMMON_SOURCES ${source})
     endif()
 endforeach()
@@ -61,5 +66,31 @@ foreach(main ${MAINS})
         target_link_libraries(${main} ${NLOHMANN_JSON_LIBRARIES})
       endif()
     endif()
-endforeach()
 
+    if(main STREQUAL "dab_play")
+      target_compile_options(${main} PRIVATE
+        ${ALSA_CFLAGS_OTHER}
+        ${LIBAVCODEC_CFLAGS_OTHER}
+        ${LIBAVUTIL_CFLAGS_OTHER}
+        ${LIBSWRESAMPLE_CFLAGS_OTHER}
+      )
+      target_link_directories(${main} PRIVATE
+        ${ALSA_LIBRARY_DIRS}
+        ${LIBAVCODEC_LIBRARY_DIRS}
+        ${LIBAVUTIL_LIBRARY_DIRS}
+        ${LIBSWRESAMPLE_LIBRARY_DIRS}
+      )
+      target_include_directories(${main} PRIVATE
+        ${ALSA_INCLUDE_DIRS}
+        ${LIBAVCODEC_INCLUDE_DIRS}
+        ${LIBAVUTIL_INCLUDE_DIRS}
+        ${LIBSWRESAMPLE_INCLUDE_DIRS}
+      )
+      target_link_libraries(${main}
+        ${ALSA_LIBRARIES}
+        ${LIBAVCODEC_LIBRARIES}
+        ${LIBAVUTIL_LIBRARIES}
+        ${LIBSWRESAMPLE_LIBRARIES}
+      )
+    endif()
+endforeach()
