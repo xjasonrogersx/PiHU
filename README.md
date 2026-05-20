@@ -6,6 +6,42 @@ I currently have a cheap chinese 9" Android head unit. This can do Android Auto 
 
 I'll document the development as I go, including my discussions with Gemini and Co-Pilot. (Don't tell Gemini I'm talking with Co-Pilot, he'll get jellous)
 
+# Build Instructions
+
+Build and test from the project root.
+
+## 1) Install system dependencies (Debian/Raspberry Pi OS)
+
+```bash
+sudo apt update
+sudo apt install -y build-essential cmake pkg-config libusb-1.0-0-dev libmosquitto-dev nlohmann-json3-dev
+```
+
+## 2) Configure and build
+
+```bash
+mkdir -p build
+cd build
+cmake ..
+cmake --build . -j$(nproc)
+```
+
+## 3) Run binaries
+
+From the build directory:
+
+```bash
+./dab/dab-radio/dab_scan
+./dab/dab-radio/dab_mp2
+./dab/dab-radio/dab_aac
+```
+
+Optional target (only built when MQTT + nlohmann_json are available):
+
+```bash
+./dab/dab-radio/dab_tuner_aac
+```
+
 # Logo
 
 First things first, Desing a logo with Gemani
