@@ -1,5 +1,41 @@
 # The display
 
+Setting up touch sceen
+| GT911 | Pi Pin |
+| -- | -- |
+| 1 RST | 11 |
+| 2 VCC | 1 |
+| 3 GND | 9 |
+| 4 INT | 7 |
+| 5 SDA | 3 |
+| 6 SCL | 5 |
+
+to `/boot/firmware/config.txt` add
+
+```
+dtparam=i2c_arm=on
+dtoverlay=goodix,interrupt=4,reset=17
+```
+And the to flip the left and right
+```
+sudo mkdir -p /etc/X11/xorg.conf.d
+sudo nano /etc/X11/xorg.conf.d/99-goodix-calibration.conf
+```
+and add
+```
+Section "InputClass"
+    Identifier "calibration"
+    MatchProduct "Goodix Capacitive TouchScreen"
+    Option "TransformationMatrix" "-1 0 1 0 1 0 0 0 1"
+EndSection
+```
+
+
+
+
+
+
+
 ## 9 Inch
 
 ![case](../images/Screenshot_20260412-130814.png)
