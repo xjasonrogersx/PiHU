@@ -21,7 +21,7 @@ from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.uix.button import Button
-from kivy.graphics import Color, RoundedRectangle
+from kivy.graphics import Color, RoundedRectangle, Rectangle
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.core.text import LabelBase
@@ -76,6 +76,16 @@ class StartScreen(Screen):
 
         root = FloatLayout()
 
+        with root.canvas.before:
+            Color(0, 0, 0, 0.35)
+            self.top_bar = Rectangle(pos=(0, Window.height * 0.86), size=(Window.width, Window.height * 0.14))
+
+        def _update_top_bar(*_args):
+            self.top_bar.pos = (0, Window.height * 0.86)
+            self.top_bar.size = (Window.width, Window.height * 0.14)
+
+        Window.bind(size=_update_top_bar)
+
         bg = Image(
             source=image_list[2],
             allow_stretch=True,
@@ -109,16 +119,28 @@ class StartScreen(Screen):
         self.clock_label = Label(
             text='--:--',
             font_name='Montserrat',
-            font_size='24sp',
+            font_size='30sp',
             bold=True,
             color=(1, 1, 1, 1),
-            size_hint=(0.32, 0.08),
-            pos_hint={'right': 0.96, 'top': 0.9},
+            size_hint=(0.28, 0.08),
+            pos_hint={'right': 0.97, 'top': 0.98},
             halign='right',
             valign='middle',
         )
         self.clock_label.bind(size=self.clock_label.setter('text_size'))
         root.add_widget(self.clock_label)
+        self.clock_subtitle = Label(
+            text='Home',
+            font_name='Montserrat',
+            font_size='14sp',
+            color=(0.9, 0.9, 0.9, 1),
+            size_hint=(0.16, 0.05),
+            pos_hint={'right': 0.97, 'top': 0.89},
+            halign='right',
+            valign='middle',
+        )
+        self.clock_subtitle.bind(size=self.clock_subtitle.setter('text_size'))
+        root.add_widget(self.clock_subtitle)
         Clock.schedule_interval(self.update_clock, 1)
 
         root.add_widget(make_left_button('Open Radio', 0.48, (0.12, 0.55, 0.9, 1), self.open_radio, font_size='22sp', width=0.34))
