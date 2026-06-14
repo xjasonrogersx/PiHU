@@ -49,6 +49,7 @@ mqtt_topic_dab_current = "car/dab/current_programme"
 mqtt_topic_dab_seek = "car/dab/seek"
 mqtt_topic_bg = "car/HU/bg_image"
 mqtt_topic_gui_cmd = "car/HU/gui/cmd"
+mqtt_topic_openauto_cmd = "car/HU/openauto/cmd"
 FONT_PATH = GUI_DIR / 'resources' / 'Montserrat' / 'Montserrat-VariableFont_wght.ttf'
 
 
@@ -69,6 +70,26 @@ def make_left_button(text, y, color, callback, font_size='14sp', width=0.38):
     )
     button.bind(on_press=callback)
     return button
+
+
+def publish_mqtt_message(topic, payload):
+    client = mqtt.Client()
+    try:
+        client.connect(mqtt_broker, mqtt_port, keepalive=5)
+        client.loop_start()
+        info = client.publish(topic, payload)
+        info.wait_for_publish()
+    except Exception as exc:
+        print(f"Error publishing MQTT message to {topic}: {exc}")
+    finally:
+        try:
+            client.loop_stop()
+        except Exception:
+            pass
+        try:
+            client.disconnect()
+        except Exception:
+            pass
 
 
 class StartScreen(Screen):
@@ -146,7 +167,8 @@ class StartScreen(Screen):
 
         root.add_widget(make_left_button('Open Radio', 0.48, (0.12, 0.55, 0.9, 1), self.open_radio, font_size='22sp', width=0.34))
         root.add_widget(make_left_button('Open CanBus', 0.32, (0.2, 0.55, 0.35, 1), self.open_canbus, font_size='22sp', width=0.34))
-        root.add_widget(make_left_button('Exit GUI', 0.16, (0.7, 0.15, 0.15, 1), close_gui, font_size='18sp', width=0.34))
+        root.add_widget(make_left_button('Android Auto', 0.16, (0.85, 0.5, 0.15, 1), self.open_android_auto, font_size='18sp', width=0.34))
+        root.add_widget(make_left_button('Exit GUI', 0.04, (0.7, 0.15, 0.15, 1), close_gui, font_size='18sp', width=0.34))
 
         self.add_widget(root)
 
@@ -155,6 +177,28 @@ class StartScreen(Screen):
 
     def open_canbus(self, _instance):
         self.manager.current = 'canbus'
+
+    def open_android_auto(self, _instance):
+        publish_mqtt_message(mqtt_topic_openauto_cmd, 'focus')
+        self.bring_to_front()
+
+    def bring_to_front(self):
+        try:
+            if hasattr(Window, 'show'):
+                Window.show()
+        except Exception:
+            pass
+
+        try:
+            if hasattr(Window, 'raise_window'):
+                Window.raise_window()
+        except Exception:
+            pass
+
+        try:
+            Window.focus = True
+        except Exception:
+            pass
 
     def update_clock(self, _dt):
         self.clock_label.text = time.strftime('%H:%M')
@@ -466,6 +510,8 @@ class OverlayWindow(FloatLayout):
                     Clock.schedule_once(lambda dt: self.go_home())
                 elif command == "back":
                     Clock.schedule_once(lambda dt: self.go_back())
+                elif command == "focus":
+                    Clock.schedule_once(lambda dt: self.bring_to_front())
         except Exception as e:
             print(f"Error processing message: {e}")
 
@@ -473,6 +519,7 @@ class OverlayWindow(FloatLayout):
         app = App.get_running_app()
         if app is not None and hasattr(app, 'screen_manager'):
             app.screen_manager.current = 'start'
+        self.bring_to_front()
 
     def go_back(self):
         app = App.get_running_app()
@@ -484,6 +531,7 @@ class OverlayWindow(FloatLayout):
             app.screen_manager.current = 'radio'
         else:
             app.screen_manager.current = 'start'
+        self.bring_to_front()
 
     def mqtt_connect(self):
         try:

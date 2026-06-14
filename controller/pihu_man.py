@@ -67,6 +67,7 @@ TOPIC_OPENAUTO_CMD = "car/HU/openauto/cmd"
 TOPIC_DAB_CMD = "car/HU/dab/cmd"
 TOPIC_VOLUME = "car/HU/volume"
 TOPIC_AUDIO_SELECT = "car/HU/audio/select"
+OPENAUTO_WINDOW_TITLE = os.getenv("PIHU_OPENAUTO_WINDOW_TITLE", "autoapp")
 
 VIRTUAL_BUTTONS_ENABLED = _env_flag("PIHU_VIRTUAL_BUTTONS_ENABLED", True)
 VIRTUAL_BUTTON_EVENT_DEVICE = os.getenv(
@@ -487,6 +488,10 @@ class PiHUManager:
 			proc = self.processes[name]
 			if cmd == "start":
 				proc.start()
+			elif cmd in {"focus", "show", "activate"} and name == "openauto":
+				if not proc.is_running():
+					proc.start()
+				self._focus_openauto_window()
 			elif cmd == "stop":
 				proc.stop()
 				proc.always_on = False
@@ -494,6 +499,19 @@ class PiHUManager:
 				proc.restart()
 				if name in ("gui", "openauto"):
 					proc.always_on = True
+	def _focus_openauto_window(self) -> None:
+		commands = [
+			["xdotool", "search", "--name", OPENAUTO_WINDOW_TITLE, "windowactivate", "--sync"],
+			["wmctrl", "-a", OPENAUTO_WINDOW_TITLE],
+		]
+		for command in commands:
+			if self._run_quick_command(command):
+				logging.info("Focused OpenAuto using %s", command[0])
+				return
+		logging.warning(
+			"Could not focus OpenAuto window '%s' (xdotool/wmctrl unavailable or window not found)",
+			OPENAUTO_WINDOW_TITLE,
+		)
 
 		self._publish_status(f"{name}_{cmd}")
 
