@@ -16,4 +16,8 @@ The plan is to connect this to PI via
 | SCK         | SPI0 SCLK (GPIO 11)   | Pin 23              | Serial Clock signal                        |
 | INT         | GPIO 25               | Pin 22              | Hardware Interrupt (Tells Pi data arrived) |
 
+<img width="952" height="280" alt="image" src="https://github.com/user-attachments/assets/1a97176f-8f6c-420e-b865-c588b89d103d" />
+
+
+
 ![alt text](image-1.png)
