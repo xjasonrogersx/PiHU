@@ -96,8 +96,8 @@ class StartScreen(Screen):
             text='Open Radio',
             font_name='Montserrat',
             font_size='22sp',
-            size_hint=(0.36, 0.14),
-            pos_hint={'center_x': 0.5, 'center_y': 0.46},
+            size_hint=(0.34, 0.14),
+            pos_hint={'x': 0.08, 'center_y': 0.46},
             background_color=(0.12, 0.55, 0.9, 1),
         )
         radio_button.bind(on_press=self.open_radio)
@@ -107,8 +107,8 @@ class StartScreen(Screen):
             text='Open CanBus',
             font_name='Montserrat',
             font_size='22sp',
-            size_hint=(0.36, 0.14),
-            pos_hint={'center_x': 0.5, 'center_y': 0.3},
+            size_hint=(0.34, 0.14),
+            pos_hint={'x': 0.08, 'center_y': 0.3},
             background_color=(0.2, 0.55, 0.35, 1),
         )
         canbus_button.bind(on_press=self.open_canbus)
@@ -179,23 +179,12 @@ class CanBusScreen(Screen):
             text='Home',
             font_name='Montserrat',
             font_size='18sp',
-            size_hint=(0.2, 0.1),
-            pos_hint={'x': 0.06, 'y': 0.06},
+            size_hint=(0.22, 0.1),
+            pos_hint={'x': 0.08, 'y': 0.06},
             background_color=(0.2, 0.2, 0.2, 0.95),
         )
         home_button.bind(on_press=self.go_home)
         root.add_widget(home_button)
-
-        exit_button = Button(
-            text='Exit GUI',
-            font_name='Montserrat',
-            font_size='18sp',
-            size_hint=(0.2, 0.1),
-            pos_hint={'right': 0.94, 'y': 0.06},
-            background_color=(0.7, 0.15, 0.15, 0.95),
-        )
-        exit_button.bind(on_press=close_gui)
-        root.add_widget(exit_button)
 
         self.add_widget(root)
 
@@ -308,7 +297,7 @@ class OverlayWindow(FloatLayout):
             text='Home',
             font_name='Montserrat',
             font_size='14sp',
-            size_hint=(0.42, 0.09),
+            size_hint=(0.38, 0.09),
             pos_hint={'x': 0.05, 'y': 0.04},
             background_color=(0.2, 0.2, 0.2, 0.9)
         )
@@ -318,11 +307,21 @@ class OverlayWindow(FloatLayout):
             text='CanBus',
             font_name='Montserrat',
             font_size='14sp',
-            size_hint=(0.42, 0.09),
-            pos_hint={'x': 0.53, 'y': 0.04},
+            size_hint=(0.38, 0.09),
+            pos_hint={'x': 0.05, 'y': 0.15},
             background_color=(0.2, 0.45, 0.3, 0.95)
         )
         self.canbus_button.bind(on_press=self.on_canbus_press)
+
+        self.exit_button = Button(
+            text='Exit GUI',
+            font_name='Montserrat',
+            font_size='14sp',
+            size_hint=(0.38, 0.09),
+            pos_hint={'x': 0.05, 'y': 0.26},
+            background_color=(0.7, 0.15, 0.15, 0.95)
+        )
+        self.exit_button.bind(on_press=close_gui)
 
         self.sidebar.add_widget(self.station_logo)
         self.sidebar.add_widget(self.station_label)
@@ -332,6 +331,7 @@ class OverlayWindow(FloatLayout):
         self.sidebar.add_widget(self.seek_button)
         self.sidebar.add_widget(self.home_button)
         self.sidebar.add_widget(self.canbus_button)
+        self.sidebar.add_widget(self.exit_button)
         self.add_widget(self.sidebar)
 
         # Current programme data
