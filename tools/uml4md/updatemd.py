@@ -54,6 +54,24 @@ def md5(content):
     return hashlib.md5(content.encode('utf-8')).hexdigest()
 
 
+def strip_outer_uml_markers(uml_content):
+    """Remove optional outer @startuml/@enduml markers from a fenced uml block."""
+    lines = uml_content.splitlines()
+    start = 0
+    end = len(lines)
+
+    while start < end and not lines[start].strip():
+        start += 1
+    while end > start and not lines[end - 1].strip():
+        end -= 1
+
+    core = lines[start:end]
+    if len(core) >= 2 and core[0].strip().lower() == '@startuml' and core[-1].strip().lower() == '@enduml':
+        core = core[1:-1]
+
+    return '\n'.join(core).strip('\n')
+
+
 def find_plantuml_cmd():
     """Return the command list to invoke plantuml.
 
@@ -83,23 +101,31 @@ def check_plantuml_available():
 
 def generate_image(uml_content, hash_val, img_dir, theme_content):
     """Write plantuml source to /tmp/<hash> and invoke plantuml to produce a PNG."""
-    lines = ['@startuml']
-    if theme_content:
-        lines.append(theme_content)
-    lines.append(uml_content.strip())
-    lines.append('@enduml')
-
+    render_content = strip_outer_uml_markers(uml_content)
     tmp_file = os.path.join('/tmp', hash_val)
-    with open(tmp_file, 'w') as f:
-        f.write('\n'.join(lines) + '\n')
-
     os.makedirs(img_dir, exist_ok=True)
 
-    try:
-        result = subprocess.run(
+    def try_render(include_theme):
+        lines = ['@startuml']
+        if include_theme and theme_content:
+            lines.append(theme_content)
+        lines.append(render_content)
+        lines.append('@enduml')
+
+        with open(tmp_file, 'w') as f:
+            f.write('\n'.join(lines) + '\n')
+
+        return subprocess.run(
             find_plantuml_cmd() + ['-tpng', '-o', img_dir, tmp_file],
             capture_output=True, text=True, timeout=30
         )
+
+    try:
+        result = try_render(include_theme=True)
+
+        # Fallback: some PlantUML versions don't support theme directives.
+        if result.returncode != 0 and theme_content:
+            result = try_render(include_theme=False)
 
         if result.returncode != 0:
             print(f"Warning: plantuml failed for {hash_val}:\n{result.stderr}", file=sys.stderr)

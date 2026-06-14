@@ -36,87 +36,75 @@ Plan is to have an arduino to manage power
  ─────────────────────────────────────────────── [ GROUND (GND) ] ───────────────────────────────────────────────
 ```
 
+![](.img/07a4d5f12f8004a7954715b4ad34dec0.png)
+<details>
+<summary>View UML</summary>
+
 ```uml
-@startuml
 skinparam componentStyle rectangle
 skinparam BackgroundColor #FFFFFF
-skinparam DefaultFontName Arial
 
-title Custom Pi Headunit - Power Control & Component Wiring Architecture
+title Pi Headunit Power and Control Architecture
 
-' Define Power Sources
-cloud "12V Permanent Live\n(Car Battery)" as Perm12V #DarkRed;text:white
-node "12V Switched Live\n(Ignition Switch)" as Ign12V #Orange;text:black
-
-' Define Regulators and Switches
-package "Power Management Panel" {
-    component "Always-On 5V Buck" as NanoBuck #LightGray
-    component "Switch 1: P-CH MOSFET\n(Pi Main Power)" as Sw1 #Pink
-    component "Switch 2: P-CH MOSFET\n(HDMI Display Power)" as Sw2 #Pink
-    component "Switch 3: P-CH MOSFET\n(TPA3110 Amp Power)" as Sw3 #Pink
-    component "High-Current 5V Buck\n(Pi Dedicated Regulator)" as PiBuck #LightGray
+package "Power Inputs" {
+  cloud "12V Permanent Live\n(Battery)" as BATT
+  node "12V Ignition\n(Switched)" as IGN
 }
 
-' Define Control Units
-package "Logic & Data Core" {
-    component "Arduino Nano\n(Power Watchdog)" as Arduino #LightBlue
-    component "Raspberry Pi Headunit\n(MQTT Broker / Core UI)" as Pi #LightGreen
-    component "Voltage Divider\n(12V -> 4V Sense)" as VolDiv #LightYellow
-    component "UART Level Shifter\n(5V <-> 3.3V)" as LvlShift #LightYellow
+package "Power Management" {
+  component "Always-On 5V Buck" as BUCK_AO
+  component "MOSFET Switch 1\n(Pi Rail)" as SW_PI
+  component "MOSFET Switch 2\n(Screen Rail)" as SW_SCREEN
+  component "MOSFET Switch 3\n(Amp Rail)" as SW_AMP
+  component "5V USB Buck\n(Pi)" as BUCK_PI
+  component "5V USB Buck\n(Screen)" as BUCK_SCREEN
 }
 
-' Define Peripherals
-package "Peripherals & Networking" {
-    component "MCP2515 Module\n(CAN Controller)" as MCP #LightCyan
-    component "HDMI Screen Panel\n(Display Panel)" as Display #NavajoWhite
-    component "I2C Touchscreen Digitizer" as Digitizer #NavajoWhite
-    component "TPA3110 Audio Amp\n(30W + 30W Board)" as Amp #Thistle
-    node "Vehicle CAN Bus\n(OBD-II Interface)" as CarCAN #Gray;text:white
+package "Controller" {
+  component "Arduino Nano\n(Watchdog)" as MCU
+  component "Voltage Divider\n(12V -> Logic)" as DIV
+  component "UART Level Shifter\n(5V <-> 3.3V)" as LVL
 }
 
-' --- POWER ROUTING CONSTRAINTS ---
-Perm12V --> NanoBuck : Raw 12V In
-NanoBuck --> Arduino : Clean 5V VCC
+package "Headunit and Peripherals" {
+  component "Raspberry Pi" as PI
+  component "MCP2515 CAN Module" as MCP
+  node "Vehicle CAN" as CANBUS
+  component "HDMI Screen" as SCREEN
+  component "I2C Touch Digitizer" as TOUCH
+  component "TPA3110 Amp" as AMP
+}
 
-Perm12V --> Sw1 : High-Side Supply
-Perm12V --> Sw2 : High-Side Supply
-Perm12V --> Sw3 : High-Side Supply
+BATT --> BUCK_AO : 12V
+BUCK_AO --> MCU : 5V
 
-Sw1 --> PiBuck : Switched 12V
-PiBuck --> Pi : Clean 5V (Main Input)
+BATT --> SW_PI
+BATT --> SW_SCREEN
+BATT --> SW_AMP
 
-Sw2 --> Display : Switched 12V (or 5V Power)
-Sw3 --> Amp : Switched 12V Main VCC
+SW_PI --> BUCK_PI : switched 12V
+BUCK_PI --> PI : 5V main rail
+SW_SCREEN --> BUCK_SCREEN : switched 12V
+BUCK_SCREEN --> SCREEN : 5V USB power
+SW_AMP --> AMP : switched power
 
-' --- IGNITION SENSING ---
-Ign12V --> VolDiv : 12V Ignition Trigger
-VolDiv --> Arduino : Safe 4.2V Logic Signal (Pin D2)
+IGN --> DIV : ignition sense
+DIV --> MCU : logic level
 
-' --- ARDUINO MOSFET CONTROL LINES ---
-Arduino -[#blue]-> Sw1 : Logic Control (Pin D3)
-Arduino -[#blue]-> Sw2 : Logic Control (Pin D4)
-Arduino -[#blue]-> Sw3 : Logic Control (Pin D5)
+MCU --> SW_PI : D3
+MCU --> SW_SCREEN : D4
+MCU --> SW_AMP : D5
 
-' --- COMMUNICATION AND INTERFACES ---
-Arduino <.[#green].> LvlShift : UART (5V TTL)
-LvlShift <.[#green].> Pi : UART Pins 8 & 10 (3.3V TTL)
+MCU <--> LVL : UART (5V)
+LVL <--> PI : UART (3.3V)
 
-Pi <.[#orange].> MCP : SPI Bus + Interrupt Pin
-MCP <-> CarCAN : Differential CAN Transceiver Signaling
-
-Pi ---> Display : HDMI Video Feed
-Pi -[#purple]-> Digitizer : I2C Data & Interrupt Lines
-Pi -[#purple]-> Digitizer : 3.3V Native Bus Power
-
-' Grounding reference
-note to right of Arduino
-  All components share a common
-  chassis vehicle Ground (GND)
-end note
-
-@enduml
+PI <--> MCP : SPI + INT
+MCP <--> CANBUS : CAN H/L
+PI --> SCREEN : HDMI video
+PI --> TOUCH : I2C + 3.3V
 
 ```
+</details>
 
 ![](.img/fffdb6d25e2427047435062be1bc2c03.png)
 
