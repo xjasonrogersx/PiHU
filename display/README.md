@@ -36,12 +36,6 @@ EndSection
 
 ## 9 Inch
 
-![case](../images/Screenshot_20260412-130814.png)
-
-![case](../images/Screenshot_20260412-130932.png)
-
-![case](../images/Screenshot_20260412-130954.png)
-
 ``
 | part | cost |
 | ---- | ---- |
@@ -50,10 +44,19 @@ EndSection
 | digitiser| 9.99 |
 | _total_ | ~£52 |
 
+<details>
+
+![case](../images/Screenshot_20260412-130814.png)
+
+![case](../images/Screenshot_20260412-130932.png)
+
+![case](../images/Screenshot_20260412-130954.png)
+
+</details>
+
 ## 9 Inch Dispaly options
 
 <details>
-<summary>View UML</summary>
 
 These do not have cases
 
@@ -95,7 +98,6 @@ Not easily is my current feeling
 ## 10.1 Inch Display options
 
 <details>
-<summary>Open</summary>
 
 ``
 | option | brigtness | enclosude | price |
