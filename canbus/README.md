@@ -1,4 +1,4 @@
-#CanBus
+# CanBus
 
 Mcp2515 CAN Bus Module TJA1050 Receiver SPI Module
 
@@ -19,5 +19,20 @@ The plan is to connect this to PI via
 <img width="952" height="280" alt="image" src="https://github.com/user-attachments/assets/1a97176f-8f6c-420e-b865-c588b89d103d" />
 
 
+## Setup
+
+```
+sudo nano /boot/firmware/config.txt
+```
+
+```
+dtparam=spi=on
+dtoverlay=mcp2515-can0,oscillator=8000000,interrupt=25
+
+```
+
+CRITICAL CHECK: Look at the small metal silver cylinder (the crystal oscillator) on your physical MCP2515 PCB. It will usually have text stamped on it.
+* If it says 8.000 or 8000, use oscillator=8000000 (8MHz).
+* If it says 16.000 or 16000, change the line to oscillator=16000000 (16MHz). 
 
 ![alt text](image-1.png)
