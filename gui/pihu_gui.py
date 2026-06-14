@@ -24,6 +24,7 @@ from kivy.graphics import Color, RoundedRectangle
 from kivy.core.window import Window
 from kivy.clock import Clock
 from kivy.core.text import LabelBase
+from kivy.uix.screenmanager import ScreenManager, Screen, FadeTransition
 
 import paho.mqtt.client as mqtt
 
@@ -46,17 +47,89 @@ mqtt_port = 1883
 mqtt_topic_dab_current = "car/dab/current_programme"
 mqtt_topic_dab_seek = "car/dab/seek"
 mqtt_topic_bg = "car/HU/bg_image"
+FONT_PATH = GUI_DIR / 'resources' / 'Montserrat' / 'Montserrat-VariableFont_wght.ttf'
+
+
+def close_gui(*_args):
+    app = App.get_running_app()
+    if app is not None:
+        app.stop()
+
+
+class StartScreen(Screen):
+    def __init__(self, **kwargs):
+        super(StartScreen, self).__init__(**kwargs)
+
+        root = FloatLayout()
+
+        bg = Image(
+            source=image_list[2],
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1),
+            pos_hint={'x': 0, 'y': 0},
+        )
+        root.add_widget(bg)
+
+        title = Label(
+            text='PiHU',
+            font_name='Montserrat',
+            font_size='46sp',
+            bold=True,
+            color=(1, 1, 1, 1),
+            size_hint=(1, 0.2),
+            pos_hint={'center_x': 0.5, 'top': 0.92},
+        )
+        root.add_widget(title)
+
+        subtitle = Label(
+            text='Car Head Unit',
+            font_name='Montserrat',
+            font_size='18sp',
+            color=(0.9, 0.9, 0.9, 1),
+            size_hint=(1, 0.12),
+            pos_hint={'center_x': 0.5, 'top': 0.74},
+        )
+        root.add_widget(subtitle)
+
+        radio_button = Button(
+            text='Open Radio',
+            font_name='Montserrat',
+            font_size='22sp',
+            size_hint=(0.36, 0.14),
+            pos_hint={'center_x': 0.5, 'center_y': 0.42},
+            background_color=(0.12, 0.55, 0.9, 1),
+        )
+        radio_button.bind(on_press=self.open_radio)
+        root.add_widget(radio_button)
+
+        exit_button = Button(
+            text='Exit GUI',
+            font_name='Montserrat',
+            font_size='18sp',
+            size_hint=(0.24, 0.1),
+            pos_hint={'center_x': 0.5, 'center_y': 0.24},
+            background_color=(0.7, 0.15, 0.15, 1),
+        )
+        exit_button.bind(on_press=close_gui)
+        root.add_widget(exit_button)
+
+        self.add_widget(root)
+
+    def open_radio(self, _instance):
+        self.manager.current = 'radio'
+
+
+class RadioScreen(Screen):
+    def __init__(self, **kwargs):
+        super(RadioScreen, self).__init__(**kwargs)
+        self.add_widget(OverlayWindow())
 
 
 
 class OverlayWindow(FloatLayout):
     def __init__(self, **kwargs):
         super(OverlayWindow, self).__init__(**kwargs)
-
-        #
-        # register the font (adjust path if you put the .ttf elsewhere)
-        LabelBase.register(name='Montserrat',
-                        fn_regular=str(GUI_DIR / 'resources' / 'Montserrat' / 'Montserrat-VariableFont_wght.ttf'))
 
 
         # Background image
@@ -71,7 +144,7 @@ class OverlayWindow(FloatLayout):
 
         # Sidebar on the LEFT, 30% wide, 80% tall, vertically centred
         self.sidebar = FloatLayout(
-            size_hint=(0.3, 0.8),
+            size_hint=(0.34, 0.92),
             pos_hint={'x': 0.02, 'center_y': 0.5}
         )
         self.sidebar.bind(size=self.update_rect, pos=self.update_rect)
@@ -87,8 +160,8 @@ class OverlayWindow(FloatLayout):
         # Station logo (128x128)
         self.station_logo = Image(
             source='',
-            size_hint=(0.5, 0.3),
-            pos_hint={'center_x': 0.5, 'top': 1},
+            size_hint=(0.64, 0.3),
+            pos_hint={'center_x': 0.5, 'top': 0.98},
             allow_stretch=True,
             keep_ratio=True
         )
@@ -97,13 +170,13 @@ class OverlayWindow(FloatLayout):
         self.station_label = Label(
             text="No Station",
             font_name='Montserrat',
-            font_size='20sp',
+            font_size='18sp',
             bold=True,
             color=(1, 1, 1, 1),
             halign='center',
             valign='middle',
             size_hint=(1, 0.12),
-            pos_hint={'center_x': 0.5, 'top': 0.65}
+            pos_hint={'center_x': 0.5, 'top': 0.64}
         )
         self.station_label.bind(size=self.station_label.setter('text_size'))
 
@@ -111,11 +184,11 @@ class OverlayWindow(FloatLayout):
         self.station_type = Label(
             text="Type: --",
             font_name='Montserrat',
-            font_size='14sp',
+            font_size='13sp',
             color=(1, 1, 0, 1),
             halign='center',
             size_hint=(1, 0.08),
-            pos_hint={'center_x': 0.5, 'top': 0.52}
+            pos_hint={'center_x': 0.5, 'top': 0.5}
         )
         self.station_type.bind(size=self.station_type.setter('text_size'))
 
@@ -127,7 +200,7 @@ class OverlayWindow(FloatLayout):
             color=(0.8, 0.8, 0.8, 1),
             halign='center',
             size_hint=(1, 0.08),
-            pos_hint={'center_x': 0.5, 'top': 0.43}
+            pos_hint={'center_x': 0.5, 'top': 0.41}
         )
         self.ensemble_label.bind(size=self.ensemble_label.setter('text_size'))
 
@@ -139,7 +212,7 @@ class OverlayWindow(FloatLayout):
             color=(0.8, 0.8, 0.8, 1),
             halign='center',
             size_hint=(1, 0.08),
-            pos_hint={'center_x': 0.5, 'top': 0.34}
+            pos_hint={'center_x': 0.5, 'top': 0.32}
         )
         self.bitrate_label.bind(size=self.bitrate_label.setter('text_size'))
 
@@ -147,12 +220,32 @@ class OverlayWindow(FloatLayout):
         self.seek_button = Button(
             text='⏭️ SEEK',
             font_name='Montserrat',
-            font_size='16sp',
+            font_size='15sp',
             size_hint=(0.8, 0.12),
-            pos_hint={'center_x': 0.5, 'top': 0.22},
+            pos_hint={'center_x': 0.5, 'top': 0.2},
             background_color=(0.2, 0.6, 1, 1)
         )
         self.seek_button.bind(on_press=self.on_seek_press)
+
+        self.home_button = Button(
+            text='Home',
+            font_name='Montserrat',
+            font_size='14sp',
+            size_hint=(0.3, 0.09),
+            pos_hint={'x': 0.05, 'y': 0.04},
+            background_color=(0.2, 0.2, 0.2, 0.9)
+        )
+        self.home_button.bind(on_press=self.on_home_press)
+
+        self.exit_button = Button(
+            text='Exit GUI',
+            font_name='Montserrat',
+            font_size='14sp',
+            size_hint=(0.18, 0.09),
+            pos_hint={'right': 0.985, 'y': 0.04},
+            background_color=(0.7, 0.15, 0.15, 0.95)
+        )
+        self.exit_button.bind(on_press=close_gui)
 
         self.sidebar.add_widget(self.station_logo)
         self.sidebar.add_widget(self.station_label)
@@ -160,7 +253,9 @@ class OverlayWindow(FloatLayout):
         self.sidebar.add_widget(self.ensemble_label)
         self.sidebar.add_widget(self.bitrate_label)
         self.sidebar.add_widget(self.seek_button)
+        self.sidebar.add_widget(self.home_button)
         self.add_widget(self.sidebar)
+        self.add_widget(self.exit_button)
 
         # Current programme data
         self.current_programme = {}
@@ -235,6 +330,11 @@ class OverlayWindow(FloatLayout):
         self.mqtt_client.publish(mqtt_topic_dab_seek, '1')
         print("Seek/Skip published")
 
+    def on_home_press(self, _instance):
+        app = App.get_running_app()
+        if app is not None and hasattr(app, 'screen_manager'):
+            app.screen_manager.current = 'start'
+
     def load_background(self, image_path):
         if not os.path.isabs(image_path):
             image_path = str((BASE_DIR / image_path).resolve())
@@ -292,11 +392,19 @@ class OverlayWindow(FloatLayout):
 
 class MyApp(App):
     def build(self):
+        if FONT_PATH.exists():
+            LabelBase.register(name='Montserrat', fn_regular=str(FONT_PATH))
+
         if "--fullscreen" in sys.argv:
             Window.fullscreen = 'auto'
         else:
-            Window.size = (1024, 800)
-        return OverlayWindow()
+            Window.size = (1024, 600)
+
+        self.screen_manager = ScreenManager(transition=FadeTransition(duration=0.2))
+        self.screen_manager.add_widget(StartScreen(name='start'))
+        self.screen_manager.add_widget(RadioScreen(name='radio'))
+        self.screen_manager.current = 'start'
+        return self.screen_manager
 
 
 if __name__ == '__main__':
