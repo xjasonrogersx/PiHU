@@ -36,7 +36,7 @@ GUI_CWD = Path(os.getenv("PIHU_GUI_CWD", str(BASE_DIR / "gui")))
 GUI_CMD = shlex.split(os.getenv("PIHU_GUI_CMD", "python3 pihu_gui.py --fullscreen"))
 
 OPENAUTO_CWD = Path(os.getenv("PIHU_OPENAUTO_CWD", str(Path.home())))
-OPENAUTO_CMD = shlex.split(os.getenv("PIHU_OPENAUTO_CMD", "./openauto"))
+OPENAUTO_CMD = shlex.split(os.getenv("PIHU_OPENAUTO_CMD", "/usr/bin/autoapp --log_level info"))
 OPENAUTO_LD_LIBRARY_PATH = os.path.expanduser(
 	os.getenv("PIHU_OPENAUTO_LD_LIBRARY_PATH", "~/.")
 )
