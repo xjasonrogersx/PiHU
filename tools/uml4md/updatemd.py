@@ -117,6 +117,14 @@ def generate_image(uml_content, hash_val, img_dir, theme_content):
     return True
 
 
+def make_raw_uml_block(uml_content):
+    return (
+        f'```uml\n'
+        f'{uml_content}'
+        f'```'
+    )
+
+
 def make_block(hash_val, uml_content):
     return (
         f'![](.img/{hash_val}.png)\n'
@@ -160,18 +168,31 @@ def process_markdown(md_file_path, plantuml_available=True):
             if new_hash == old_hash:
                 return m.group(0)
             old_img = os.path.join(img_dir, old_hash + '.png')
-            if os.path.exists(old_img):
-                os.remove(old_img)
             if plantuml_available:
-                generate_image(uml_content, new_hash, img_dir, theme_content)
-            return make_block(new_hash, uml_content)
+                if generate_image(uml_content, new_hash, img_dir, theme_content):
+                    if os.path.exists(old_img):
+                        os.remove(old_img)
+                    return make_block(new_hash, uml_content)
+                # Keep source UML visible if render fails.
+                return make_raw_uml_block(uml_content)
+            return make_raw_uml_block(uml_content)
         else:
             # Raw ```uml block — wrap it
             uml_content = m.group(3)
+            # Avoid double-wrapping when a raw uml fence is already inside
+            # an existing generated View UML details block.
+            prefix = original[:m.start()]
+            last_open = prefix.rfind('<details>\n<summary>View UML</summary>')
+            last_close = prefix.rfind('</details>')
+            if last_open != -1 and last_open > last_close:
+                return m.group(0)
             hash_val = md5(uml_content)
             if plantuml_available:
-                generate_image(uml_content, hash_val, img_dir, theme_content)
-            return make_block(hash_val, uml_content)
+                if generate_image(uml_content, hash_val, img_dir, theme_content):
+                    return make_block(hash_val, uml_content)
+                # Keep source UML visible if render fails.
+                return make_raw_uml_block(uml_content)
+            return make_raw_uml_block(uml_content)
 
     updated = _PATTERN.sub(replace, original)
 
