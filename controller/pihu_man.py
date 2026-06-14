@@ -7,6 +7,7 @@ Responsibilities:
 - Connect to MQTT and handle runtime commands.
 - Start/stop DAB process on MQTT request.
 - Handle audio sink selection and volume control.
+- Monitor optional GT911 side-strip virtual buttons from raw evdev events.
 """
 
 from __future__ import annotations
@@ -21,14 +22,27 @@ import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import paho.mqtt.client as mqtt
+
+try:
+	from evdev import InputDevice, ecodes
+except ImportError:  # pragma: no cover - depends on target runtime package
+	InputDevice = None
+	ecodes = None
 
 
 LOG_LEVEL = os.getenv("PIHU_LOG_LEVEL", "INFO").upper()
 MQTT_HOST = os.getenv("PIHU_MQTT_HOST", "localhost")
 MQTT_PORT = int(os.getenv("PIHU_MQTT_PORT", "1883"))
+
+
+def _env_flag(name: str, default: bool) -> bool:
+	value = os.getenv(name)
+	if value is None:
+		return default
+	return value.strip().lower() in {"1", "true", "yes", "on"}
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 
@@ -53,6 +67,45 @@ TOPIC_OPENAUTO_CMD = "car/HU/openauto/cmd"
 TOPIC_DAB_CMD = "car/HU/dab/cmd"
 TOPIC_VOLUME = "car/HU/volume"
 TOPIC_AUDIO_SELECT = "car/HU/audio/select"
+
+VIRTUAL_BUTTONS_ENABLED = _env_flag("PIHU_VIRTUAL_BUTTONS_ENABLED", True)
+VIRTUAL_BUTTON_EVENT_DEVICE = os.getenv(
+	"PIHU_VIRTUAL_BUTTON_EVENT_DEVICE", "/dev/input/event4"
+)
+VIRTUAL_BUTTON_MIN_X = int(os.getenv("PIHU_VIRTUAL_BUTTON_MIN_X", "1040"))
+VIRTUAL_BUTTON_DEBOUNCE_S = float(os.getenv("PIHU_VIRTUAL_BUTTON_DEBOUNCE_S", "0.35"))
+VIRTUAL_BUTTON_VOLUME_STEP = os.getenv("PIHU_VIRTUAL_BUTTON_VOLUME_STEP", "5%")
+VIRTUAL_BUTTON_ACTIONS = (
+	"power",
+	"home",
+	"back",
+	"volume_up",
+	"volume_down",
+)
+VIRTUAL_BUTTON_Y_CENTERS = (104, 175, 262, 348, 433)
+
+
+def _build_virtual_button_bands(
+	actions: Tuple[str, ...], centers: Tuple[int, ...]
+) -> Tuple[Tuple[str, int, Optional[int]], ...]:
+	if len(actions) != len(centers):
+		raise ValueError("virtual button actions/centers length mismatch")
+
+	bands = []
+	lower = 0
+	for index, action in enumerate(actions):
+		upper = None
+		if index < len(centers) - 1:
+			upper = (centers[index] + centers[index + 1]) // 2
+		bands.append((action, lower, upper))
+		if upper is not None:
+			lower = upper + 1
+	return tuple(bands)
+
+
+VIRTUAL_BUTTON_Y_BANDS = _build_virtual_button_bands(
+	VIRTUAL_BUTTON_ACTIONS, VIRTUAL_BUTTON_Y_CENTERS
+)
 
 
 @dataclass
@@ -160,11 +213,13 @@ class PiHUManager:
 		self.mqtt_client.on_connect = self._on_connect
 		self.mqtt_client.on_disconnect = self._on_disconnect
 		self.mqtt_client.on_message = self._on_message
+		self.virtual_button_thread: Optional[threading.Thread] = None
 
 	def start(self) -> None:
 		self._install_signal_handlers()
 		self._start_always_on_processes()
 		self._start_mqtt()
+		self._start_virtual_button_monitor()
 
 		supervisor_thread = threading.Thread(target=self._supervisor_loop, daemon=True)
 		supervisor_thread.start()
@@ -195,6 +250,128 @@ class PiHUManager:
 		logging.info("Connecting MQTT to %s:%s", MQTT_HOST, MQTT_PORT)
 		self.mqtt_client.connect_async(MQTT_HOST, MQTT_PORT, keepalive=30)
 		self.mqtt_client.loop_start()
+
+	def _start_virtual_button_monitor(self) -> None:
+		if not VIRTUAL_BUTTONS_ENABLED:
+			return
+		if InputDevice is None or ecodes is None:
+			logging.warning("Virtual buttons disabled: python3-evdev unavailable")
+			return
+
+		self.virtual_button_thread = threading.Thread(
+			target=self._virtual_button_loop,
+			name="virtual-buttons",
+			daemon=True,
+		)
+		self.virtual_button_thread.start()
+
+	def _virtual_button_loop(self) -> None:
+		open_error_logged = False
+		while not self.shutdown_event.is_set():
+			device = None
+			try:
+				device = InputDevice(VIRTUAL_BUTTON_EVENT_DEVICE)
+				open_error_logged = False
+				logging.info("Monitoring virtual buttons on %s", VIRTUAL_BUTTON_EVENT_DEVICE)
+				self._read_virtual_button_events(device)
+			except (FileNotFoundError, PermissionError, OSError) as exc:
+				if not open_error_logged:
+					logging.warning(
+						"Virtual buttons unavailable on %s: %s",
+						VIRTUAL_BUTTON_EVENT_DEVICE,
+						exc,
+					)
+					open_error_logged = True
+			except Exception:
+				logging.exception("Virtual button monitor failed")
+			finally:
+				if device is not None:
+					device.close()
+
+			if self.shutdown_event.wait(5):
+				return
+
+	def _read_virtual_button_events(self, device: InputDevice) -> None:
+		latest_x: Optional[int] = None
+		latest_y: Optional[int] = None
+		touch_active = False
+		touch_triggered = False
+		last_trigger_time = 0.0
+
+		for event in device.read_loop():
+			if self.shutdown_event.is_set():
+				return
+
+			if event.type == ecodes.EV_ABS:
+				if event.code in (ecodes.ABS_MT_POSITION_X, ecodes.ABS_X):
+					latest_x = event.value
+				elif event.code in (ecodes.ABS_MT_POSITION_Y, ecodes.ABS_Y):
+					latest_y = event.value
+				elif event.code == ecodes.ABS_MT_TRACKING_ID:
+					if event.value == -1:
+						touch_active = False
+						touch_triggered = False
+					else:
+						touch_active = True
+						touch_triggered = False
+			elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
+				if event.value == 0:
+					touch_active = False
+					touch_triggered = False
+				elif event.value == 1:
+					touch_active = True
+			elif event.type == ecodes.EV_SYN and event.code == ecodes.SYN_REPORT:
+				if not touch_active or touch_triggered:
+					continue
+				if latest_x is None or latest_y is None or latest_x < VIRTUAL_BUTTON_MIN_X:
+					continue
+
+				now = time.monotonic()
+				touch_triggered = True
+				if now - last_trigger_time < VIRTUAL_BUTTON_DEBOUNCE_S:
+					continue
+
+				action = self._get_virtual_button_action(latest_y)
+				if action is None:
+					continue
+
+				last_trigger_time = now
+				self._handle_virtual_button(action, latest_x, latest_y)
+
+	def _get_virtual_button_action(self, y_value: int) -> Optional[str]:
+		for action, lower, upper in VIRTUAL_BUTTON_Y_BANDS:
+			if y_value < lower:
+				continue
+			if upper is None or y_value <= upper:
+				return action
+		return None
+
+	def _handle_virtual_button(self, action: str, x_value: int, y_value: int) -> None:
+		logging.info("Virtual button %s", action)
+		if action == "power":
+			self._publish_status(
+				"virtual_power_button",
+				{"button": action, "x": x_value, "y": y_value},
+			)
+		elif action == "home":
+			self.mqtt_client.publish(TOPIC_GUI_CMD, "home", qos=0, retain=False)
+		elif action == "back":
+			self.mqtt_client.publish(TOPIC_GUI_CMD, "back", qos=0, retain=False)
+		elif action == "volume_up":
+			self._step_volume("+")
+		elif action == "volume_down":
+			self._step_volume("-")
+
+	def _step_volume(self, direction: str) -> None:
+		mute_cmd = ["wpctl", "set-mute", "@DEFAULT_AUDIO_SINK@", "0"]
+		cmd = [
+			"wpctl",
+			"set-volume",
+			"@DEFAULT_AUDIO_SINK@",
+			f"{VIRTUAL_BUTTON_VOLUME_STEP}{direction}",
+		]
+		self._run_quick_command(mute_cmd)
+		self._run_quick_command(cmd)
 
 	def _on_connect(self, client, _userdata, _flags, rc):
 		if rc != 0:
