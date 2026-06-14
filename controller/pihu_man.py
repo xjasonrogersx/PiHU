@@ -152,7 +152,11 @@ class PiHUManager:
 
 		self.dab_requested = False
 
-		self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+		# paho-mqtt 2.x exposes CallbackAPIVersion, older versions do not.
+		if hasattr(mqtt, "CallbackAPIVersion"):
+			self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+		else:
+			self.mqtt_client = mqtt.Client()
 		self.mqtt_client.on_connect = self._on_connect
 		self.mqtt_client.on_disconnect = self._on_disconnect
 		self.mqtt_client.on_message = self._on_message
