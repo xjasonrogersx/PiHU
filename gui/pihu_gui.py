@@ -52,7 +52,7 @@ class OverlayWindow(FloatLayout):
         #
         # register the font (adjust path if you put the .ttf elsewhere)
         LabelBase.register(name='Montserrat',
-                        fn_regular='/home/jason/work/PiHU/gui/kivy-test/Montserrat/static/Montserrat-SemiBold.ttf')
+                        fn_regular='./resources/Montserrat/Montserrat-VariableFont_wght.ttf')
 
 
         # Background image
