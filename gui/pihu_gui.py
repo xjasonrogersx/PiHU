@@ -516,22 +516,28 @@ class OverlayWindow(FloatLayout):
             print(f"Error processing message: {e}")
 
     def go_home(self):
-        app = App.get_running_app()
-        if app is not None and hasattr(app, 'screen_manager'):
-            app.screen_manager.current = 'start'
-        self.bring_to_front()
+        try:
+            app = App.get_running_app()
+            if app is not None and hasattr(app, 'screen_manager'):
+                app.screen_manager.current = 'start'
+            self.bring_to_front()
+        except Exception as exc:
+            print(f"Error switching GUI to home: {exc}")
 
     def go_back(self):
-        app = App.get_running_app()
-        if app is None or not hasattr(app, 'screen_manager'):
-            return
+        try:
+            app = App.get_running_app()
+            if app is None or not hasattr(app, 'screen_manager'):
+                return
 
-        current = app.screen_manager.current
-        if current == 'canbus':
-            app.screen_manager.current = 'radio'
-        else:
-            app.screen_manager.current = 'start'
-        self.bring_to_front()
+            current = app.screen_manager.current
+            if current == 'canbus':
+                app.screen_manager.current = 'radio'
+            else:
+                app.screen_manager.current = 'start'
+            self.bring_to_front()
+        except Exception as exc:
+            print(f"Error switching GUI back: {exc}")
 
     def mqtt_connect(self):
         try:
