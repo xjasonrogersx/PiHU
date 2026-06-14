@@ -97,11 +97,22 @@ class StartScreen(Screen):
             font_name='Montserrat',
             font_size='22sp',
             size_hint=(0.36, 0.14),
-            pos_hint={'center_x': 0.5, 'center_y': 0.42},
+            pos_hint={'center_x': 0.5, 'center_y': 0.46},
             background_color=(0.12, 0.55, 0.9, 1),
         )
         radio_button.bind(on_press=self.open_radio)
         root.add_widget(radio_button)
+
+        canbus_button = Button(
+            text='Open CanBus',
+            font_name='Montserrat',
+            font_size='22sp',
+            size_hint=(0.36, 0.14),
+            pos_hint={'center_x': 0.5, 'center_y': 0.3},
+            background_color=(0.2, 0.55, 0.35, 1),
+        )
+        canbus_button.bind(on_press=self.open_canbus)
+        root.add_widget(canbus_button)
 
         exit_button = Button(
             text='Exit GUI',
@@ -119,11 +130,77 @@ class StartScreen(Screen):
     def open_radio(self, _instance):
         self.manager.current = 'radio'
 
+    def open_canbus(self, _instance):
+        self.manager.current = 'canbus'
+
 
 class RadioScreen(Screen):
     def __init__(self, **kwargs):
         super(RadioScreen, self).__init__(**kwargs)
         self.add_widget(OverlayWindow())
+
+
+class CanBusScreen(Screen):
+    def __init__(self, **kwargs):
+        super(CanBusScreen, self).__init__(**kwargs)
+
+        root = FloatLayout()
+        bg = Image(
+            source=image_list[1],
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1),
+            pos_hint={'x': 0, 'y': 0},
+        )
+        root.add_widget(bg)
+
+        title = Label(
+            text='CanBus',
+            font_name='Montserrat',
+            font_size='42sp',
+            bold=True,
+            color=(1, 1, 1, 1),
+            size_hint=(1, 0.2),
+            pos_hint={'center_x': 0.5, 'top': 0.9},
+        )
+        root.add_widget(title)
+
+        status = Label(
+            text='CanBus page placeholder',
+            font_name='Montserrat',
+            font_size='18sp',
+            color=(0.95, 0.95, 0.95, 1),
+            size_hint=(1, 0.12),
+            pos_hint={'center_x': 0.5, 'top': 0.72},
+        )
+        root.add_widget(status)
+
+        home_button = Button(
+            text='Home',
+            font_name='Montserrat',
+            font_size='18sp',
+            size_hint=(0.2, 0.1),
+            pos_hint={'x': 0.06, 'y': 0.06},
+            background_color=(0.2, 0.2, 0.2, 0.95),
+        )
+        home_button.bind(on_press=self.go_home)
+        root.add_widget(home_button)
+
+        exit_button = Button(
+            text='Exit GUI',
+            font_name='Montserrat',
+            font_size='18sp',
+            size_hint=(0.2, 0.1),
+            pos_hint={'right': 0.94, 'y': 0.06},
+            background_color=(0.7, 0.15, 0.15, 0.95),
+        )
+        exit_button.bind(on_press=close_gui)
+        root.add_widget(exit_button)
+
+        self.add_widget(root)
+
+    def go_home(self, _instance):
+        self.manager.current = 'start'
 
 
 
@@ -231,21 +308,21 @@ class OverlayWindow(FloatLayout):
             text='Home',
             font_name='Montserrat',
             font_size='14sp',
-            size_hint=(0.3, 0.09),
+            size_hint=(0.42, 0.09),
             pos_hint={'x': 0.05, 'y': 0.04},
             background_color=(0.2, 0.2, 0.2, 0.9)
         )
         self.home_button.bind(on_press=self.on_home_press)
 
-        self.exit_button = Button(
-            text='Exit GUI',
+        self.canbus_button = Button(
+            text='CanBus',
             font_name='Montserrat',
             font_size='14sp',
-            size_hint=(0.18, 0.09),
-            pos_hint={'right': 0.985, 'y': 0.04},
-            background_color=(0.7, 0.15, 0.15, 0.95)
+            size_hint=(0.42, 0.09),
+            pos_hint={'x': 0.53, 'y': 0.04},
+            background_color=(0.2, 0.45, 0.3, 0.95)
         )
-        self.exit_button.bind(on_press=close_gui)
+        self.canbus_button.bind(on_press=self.on_canbus_press)
 
         self.sidebar.add_widget(self.station_logo)
         self.sidebar.add_widget(self.station_label)
@@ -254,8 +331,8 @@ class OverlayWindow(FloatLayout):
         self.sidebar.add_widget(self.bitrate_label)
         self.sidebar.add_widget(self.seek_button)
         self.sidebar.add_widget(self.home_button)
+        self.sidebar.add_widget(self.canbus_button)
         self.add_widget(self.sidebar)
-        self.add_widget(self.exit_button)
 
         # Current programme data
         self.current_programme = {}
@@ -335,6 +412,11 @@ class OverlayWindow(FloatLayout):
         if app is not None and hasattr(app, 'screen_manager'):
             app.screen_manager.current = 'start'
 
+    def on_canbus_press(self, _instance):
+        app = App.get_running_app()
+        if app is not None and hasattr(app, 'screen_manager'):
+            app.screen_manager.current = 'canbus'
+
     def load_background(self, image_path):
         if not os.path.isabs(image_path):
             image_path = str((BASE_DIR / image_path).resolve())
@@ -403,6 +485,7 @@ class MyApp(App):
         self.screen_manager = ScreenManager(transition=FadeTransition(duration=0.2))
         self.screen_manager.add_widget(StartScreen(name='start'))
         self.screen_manager.add_widget(RadioScreen(name='radio'))
+        self.screen_manager.add_widget(CanBusScreen(name='canbus'))
         self.screen_manager.current = 'start'
         return self.screen_manager
 
