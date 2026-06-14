@@ -398,11 +398,8 @@ class PiHUManager:
 	def _handle_virtual_button(self, action: str, x_value: int, y_value: int) -> None:
 		logging.info("Virtual button %s", action)
 		if action == "power":
-			logging.info("Publishing virtual power event")
-			self._publish_status(
-				"virtual_power_button",
-				{"button": action, "x": x_value, "y": y_value},
-			)
+			logging.info("Publishing GUI power command")
+			self.mqtt_client.publish(TOPIC_GUI_CMD, "power", qos=0, retain=False)
 		elif action == "home":
 			logging.info("Publishing GUI home command")
 			self.mqtt_client.publish(TOPIC_GUI_CMD, "home", qos=0, retain=False)

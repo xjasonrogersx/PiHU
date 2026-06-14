@@ -204,6 +204,57 @@ class StartScreen(Screen):
         self.clock_label.text = time.strftime('%H:%M')
 
 
+class BlackScreen(Screen):
+    def __init__(self, **kwargs):
+        super(BlackScreen, self).__init__(**kwargs)
+
+        root = FloatLayout()
+
+        with root.canvas.before:
+            Color(0, 0, 0, 1)
+            self._bg = Rectangle(pos=(0, 0), size=Window.size)
+
+        def _update_bg(*_args):
+            self._bg.size = Window.size
+
+        Window.bind(size=_update_bg)
+
+        self.clock_label = Label(
+            text='--:--',
+            font_name='Montserrat',
+            font_size='80sp',
+            bold=True,
+            color=(1, 1, 1, 1),
+            size_hint=(1, 0.3),
+            pos_hint={'center_x': 0.5, 'center_y': 0.6},
+            halign='center',
+            valign='middle',
+        )
+        self.clock_label.bind(size=self.clock_label.setter('text_size'))
+        root.add_widget(self.clock_label)
+
+        self.date_label = Label(
+            text='',
+            font_name='Montserrat',
+            font_size='22sp',
+            color=(0.7, 0.7, 0.7, 1),
+            size_hint=(1, 0.12),
+            pos_hint={'center_x': 0.5, 'center_y': 0.42},
+            halign='center',
+            valign='middle',
+        )
+        self.date_label.bind(size=self.date_label.setter('text_size'))
+        root.add_widget(self.date_label)
+
+        self.add_widget(root)
+        Clock.schedule_interval(self._tick, 1)
+        self._tick(0)
+
+    def _tick(self, _dt):
+        self.clock_label.text = time.strftime('%H:%M')
+        self.date_label.text = time.strftime('%A  %d %B %Y')
+
+
 class RadioScreen(Screen):
     def __init__(self, **kwargs):
         super(RadioScreen, self).__init__(**kwargs)
@@ -512,8 +563,19 @@ class OverlayWindow(FloatLayout):
                     Clock.schedule_once(lambda dt: self.go_back())
                 elif command == "focus":
                     Clock.schedule_once(lambda dt: self.bring_to_front())
+                elif command == "power":
+                    Clock.schedule_once(lambda dt: self.go_black())
         except Exception as e:
             print(f"Error processing message: {e}")
+
+    def go_black(self):
+        try:
+            app = App.get_running_app()
+            if app is not None and hasattr(app, 'screen_manager'):
+                app.screen_manager.current = 'black'
+            self.bring_to_front()
+        except Exception as exc:
+            print(f"Error switching GUI to black screen: {exc}")
 
     def go_home(self):
         try:
@@ -559,6 +621,7 @@ class MyApp(App):
 
         self.screen_manager = ScreenManager(transition=FadeTransition(duration=0.2))
         self.screen_manager.add_widget(StartScreen(name='start'))
+        self.screen_manager.add_widget(BlackScreen(name='black'))
         self.screen_manager.add_widget(RadioScreen(name='radio'))
         self.screen_manager.add_widget(CanBusScreen(name='canbus'))
         self.screen_manager.current = 'start'
