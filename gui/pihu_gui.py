@@ -13,6 +13,7 @@ import sys
 import threading
 import json
 import os
+from pathlib import Path
 
 from kivy.app import App
 from kivy.uix.floatlayout import FloatLayout
@@ -27,14 +28,17 @@ from kivy.core.text import LabelBase
 import paho.mqtt.client as mqtt
 
 
+BASE_DIR = Path(__file__).resolve().parents[1]
+GUI_DIR = Path(__file__).resolve().parent
+
 image_list = [
-    '../../images/1775206919136.png',  # car right
-    '../../images/1775206081435.png',  # car middle
-    '../../images/1775205902337.png',  # PiHU logo
+    str(BASE_DIR / 'images' / '1775206919136.png'),  # car right
+    str(BASE_DIR / 'images' / '1775206081435.png'),  # car middle
+    str(BASE_DIR / 'images' / '1775205902337.png'),  # PiHU logo
 ]
 
 # Radio station logos directory
-LOGO_DIR = '../../images/RadioStationLogos/RadioStationLogos_128x128_2026-04-08/'
+LOGO_DIR = str(BASE_DIR / 'images' / 'RadioStationLogos' / 'RadioStationLogos_128x128_2026-04-08')
 DEFAULT_LOGO = None  # Will be set to a placeholder or None
 
 mqtt_broker = "localhost"
@@ -52,7 +56,7 @@ class OverlayWindow(FloatLayout):
         #
         # register the font (adjust path if you put the .ttf elsewhere)
         LabelBase.register(name='Montserrat',
-                        fn_regular='./resources/Montserrat/Montserrat-VariableFont_wght.ttf')
+                        fn_regular=str(GUI_DIR / 'resources' / 'Montserrat' / 'Montserrat-VariableFont_wght.ttf'))
 
 
         # Background image
@@ -165,7 +169,11 @@ class OverlayWindow(FloatLayout):
         Window.bind(on_key_down=self.on_key_down)
 
         # MQTT
-        self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+        # paho-mqtt 2.x exposes CallbackAPIVersion, older versions do not.
+        if hasattr(mqtt, 'CallbackAPIVersion'):
+            self.mqtt_client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION1)
+        else:
+            self.mqtt_client = mqtt.Client()
         self.mqtt_client.on_connect = self.on_mqtt_connect
         self.mqtt_client.on_message = self.on_mqtt_message
         mqtt_thread = threading.Thread(target=self.mqtt_connect, daemon=True)
@@ -228,6 +236,8 @@ class OverlayWindow(FloatLayout):
         print("Seek/Skip published")
 
     def load_background(self, image_path):
+        if not os.path.isabs(image_path):
+            image_path = str((BASE_DIR / image_path).resolve())
         self.bg_image.source = image_path
         self.bg_image.reload()
 
