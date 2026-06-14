@@ -48,6 +48,7 @@ mqtt_port = 1883
 mqtt_topic_dab_current = "car/dab/current_programme"
 mqtt_topic_dab_seek = "car/dab/seek"
 mqtt_topic_bg = "car/HU/bg_image"
+mqtt_topic_gui_cmd = "car/HU/gui/cmd"
 FONT_PATH = GUI_DIR / 'resources' / 'Montserrat' / 'Montserrat-VariableFont_wght.ttf'
 
 
@@ -435,7 +436,8 @@ class OverlayWindow(FloatLayout):
             print("Connected to MQTT broker")
             client.subscribe(mqtt_topic_dab_current)
             client.subscribe(mqtt_topic_bg)
-            print(f"Subscribed to: {mqtt_topic_dab_current}, {mqtt_topic_bg}")
+            client.subscribe(mqtt_topic_gui_cmd)
+            print(f"Subscribed to: {mqtt_topic_dab_current}, {mqtt_topic_bg}, {mqtt_topic_gui_cmd}")
         else:
             print(f"Failed to connect, return code {rc}")
 
@@ -458,8 +460,30 @@ class OverlayWindow(FloatLayout):
                         print(f"Invalid image index: {index}. Must be 0-{len(image_list) - 1}")
                 except ValueError:
                     Clock.schedule_once(lambda dt: self.load_background(bg_index))
+            elif msg.topic == mqtt_topic_gui_cmd:
+                command = msg.payload.decode().strip().lower()
+                if command == "home":
+                    Clock.schedule_once(lambda dt: self.go_home())
+                elif command == "back":
+                    Clock.schedule_once(lambda dt: self.go_back())
         except Exception as e:
             print(f"Error processing message: {e}")
+
+    def go_home(self):
+        app = App.get_running_app()
+        if app is not None and hasattr(app, 'screen_manager'):
+            app.screen_manager.current = 'start'
+
+    def go_back(self):
+        app = App.get_running_app()
+        if app is None or not hasattr(app, 'screen_manager'):
+            return
+
+        current = app.screen_manager.current
+        if current == 'canbus':
+            app.screen_manager.current = 'radio'
+        else:
+            app.screen_manager.current = 'start'
 
     def mqtt_connect(self):
         try:
