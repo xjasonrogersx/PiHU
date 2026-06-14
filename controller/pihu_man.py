@@ -499,6 +499,9 @@ class PiHUManager:
 				proc.restart()
 				if name in ("gui", "openauto"):
 					proc.always_on = True
+
+		self._publish_status(f"{name}_{cmd}")
+
 	def _focus_openauto_window(self) -> None:
 		commands = [
 			["xdotool", "search", "--name", OPENAUTO_WINDOW_TITLE, "windowactivate", "--sync"],
@@ -512,8 +515,6 @@ class PiHUManager:
 			"Could not focus OpenAuto window '%s' (xdotool/wmctrl unavailable or window not found)",
 			OPENAUTO_WINDOW_TITLE,
 		)
-
-		self._publish_status(f"{name}_{cmd}")
 
 	def _handle_dab_command(self, payload: str) -> None:
 		cmd = payload.lower()
