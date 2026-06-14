@@ -22,12 +22,12 @@ import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import paho.mqtt.client as mqtt
 
 try:
-	from evdev import InputDevice, ecodes
+	from evdev import InputDevice, ecodes  # type: ignore[import-not-found]
 except ImportError:  # pragma: no cover - depends on target runtime package
 	InputDevice = None
 	ecodes = None
@@ -253,10 +253,20 @@ class PiHUManager:
 
 	def _start_virtual_button_monitor(self) -> None:
 		if not VIRTUAL_BUTTONS_ENABLED:
+			logging.info("Virtual buttons disabled by PIHU_VIRTUAL_BUTTONS_ENABLED")
 			return
 		if InputDevice is None or ecodes is None:
 			logging.warning("Virtual buttons disabled: python3-evdev unavailable")
 			return
+
+		logging.info(
+			"Virtual buttons enabled: device=%s min_x=%s debounce=%.2fs step=%s bands=%s",
+			VIRTUAL_BUTTON_EVENT_DEVICE,
+			VIRTUAL_BUTTON_MIN_X,
+			VIRTUAL_BUTTON_DEBOUNCE_S,
+			VIRTUAL_BUTTON_VOLUME_STEP,
+			VIRTUAL_BUTTON_Y_BANDS,
+		)
 
 		self.virtual_button_thread = threading.Thread(
 			target=self._virtual_button_loop,
@@ -270,6 +280,7 @@ class PiHUManager:
 		while not self.shutdown_event.is_set():
 			device = None
 			try:
+				logging.info("Opening virtual button device %s", VIRTUAL_BUTTON_EVENT_DEVICE)
 				device = InputDevice(VIRTUAL_BUTTON_EVENT_DEVICE)
 				open_error_logged = False
 				logging.info("Monitoring virtual buttons on %s", VIRTUAL_BUTTON_EVENT_DEVICE)
@@ -291,12 +302,13 @@ class PiHUManager:
 			if self.shutdown_event.wait(5):
 				return
 
-	def _read_virtual_button_events(self, device: InputDevice) -> None:
+	def _read_virtual_button_events(self, device: Any) -> None:
 		latest_x: Optional[int] = None
 		latest_y: Optional[int] = None
 		touch_active = False
 		touch_triggered = False
 		last_trigger_time = 0.0
+		logging.info("Virtual button event loop active for %s", getattr(device, "path", VIRTUAL_BUTTON_EVENT_DEVICE))
 
 		for event in device.read_loop():
 			if self.shutdown_event.is_set():
@@ -305,37 +317,73 @@ class PiHUManager:
 			if event.type == ecodes.EV_ABS:
 				if event.code in (ecodes.ABS_MT_POSITION_X, ecodes.ABS_X):
 					latest_x = event.value
+					logging.debug("Virtual button ABS X=%s", latest_x)
 				elif event.code in (ecodes.ABS_MT_POSITION_Y, ecodes.ABS_Y):
 					latest_y = event.value
+					logging.debug("Virtual button ABS Y=%s", latest_y)
 				elif event.code == ecodes.ABS_MT_TRACKING_ID:
 					if event.value == -1:
 						touch_active = False
 						touch_triggered = False
+						logging.debug("Virtual button touch released via TRACKING_ID=-1")
 					else:
 						touch_active = True
 						touch_triggered = False
+						logging.debug("Virtual button touch active via TRACKING_ID=%s", event.value)
 			elif event.type == ecodes.EV_KEY and event.code == ecodes.BTN_TOUCH:
 				if event.value == 0:
 					touch_active = False
 					touch_triggered = False
+					logging.debug("Virtual button BTN_TOUCH released")
 				elif event.value == 1:
 					touch_active = True
+					logging.debug("Virtual button BTN_TOUCH pressed")
 			elif event.type == ecodes.EV_SYN and event.code == ecodes.SYN_REPORT:
+				logging.debug(
+					"Virtual button SYN_REPORT x=%s y=%s active=%s triggered=%s",
+					latest_x,
+					latest_y,
+					touch_active,
+					touch_triggered,
+				)
 				if not touch_active or touch_triggered:
+					logging.debug(
+						"Virtual button ignored: touch_active=%s touch_triggered=%s",
+						touch_active,
+					touch_triggered,
+					)
 					continue
 				if latest_x is None or latest_y is None or latest_x < VIRTUAL_BUTTON_MIN_X:
+					logging.debug(
+						"Virtual button ignored by position: x=%s y=%s min_x=%s",
+						latest_x,
+						latest_y,
+						VIRTUAL_BUTTON_MIN_X,
+					)
 					continue
 
 				now = time.monotonic()
 				touch_triggered = True
 				if now - last_trigger_time < VIRTUAL_BUTTON_DEBOUNCE_S:
+					logging.info(
+						"Virtual button debounced: x=%s y=%s delta=%.3fs",
+						latest_x,
+						latest_y,
+						now - last_trigger_time,
+					)
 					continue
 
 				action = self._get_virtual_button_action(latest_y)
 				if action is None:
+					logging.info(
+						"Virtual button ignored: no action for y=%s bands=%s",
+						latest_y,
+						VIRTUAL_BUTTON_Y_BANDS,
+					)
 					continue
 
 				last_trigger_time = now
+				logging.info("Virtual button resolved to action=%s x=%s y=%s", action, latest_x, latest_y)
 				self._handle_virtual_button(action, latest_x, latest_y)
 
 	def _get_virtual_button_action(self, y_value: int) -> Optional[str]:
@@ -349,17 +397,22 @@ class PiHUManager:
 	def _handle_virtual_button(self, action: str, x_value: int, y_value: int) -> None:
 		logging.info("Virtual button %s", action)
 		if action == "power":
+			logging.info("Publishing virtual power event")
 			self._publish_status(
 				"virtual_power_button",
 				{"button": action, "x": x_value, "y": y_value},
 			)
 		elif action == "home":
+			logging.info("Publishing GUI home command")
 			self.mqtt_client.publish(TOPIC_GUI_CMD, "home", qos=0, retain=False)
 		elif action == "back":
+			logging.info("Publishing GUI back command")
 			self.mqtt_client.publish(TOPIC_GUI_CMD, "back", qos=0, retain=False)
 		elif action == "volume_up":
+			logging.info("Applying volume up step %s", VIRTUAL_BUTTON_VOLUME_STEP)
 			self._step_volume("+")
 		elif action == "volume_down":
+			logging.info("Applying volume down step %s", VIRTUAL_BUTTON_VOLUME_STEP)
 			self._step_volume("-")
 
 	def _step_volume(self, direction: str) -> None:
