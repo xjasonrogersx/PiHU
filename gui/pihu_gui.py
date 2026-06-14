@@ -13,6 +13,7 @@ import sys
 import threading
 import json
 import os
+import time
 from pathlib import Path
 
 from kivy.app import App
@@ -56,6 +57,19 @@ def close_gui(*_args):
         app.stop()
 
 
+def make_left_button(text, y, color, callback, font_size='14sp', width=0.38):
+    button = Button(
+        text=text,
+        font_name='Montserrat',
+        font_size=font_size,
+        size_hint=(width, 0.09),
+        pos_hint={'x': 0.05, 'y': y},
+        background_color=color,
+    )
+    button.bind(on_press=callback)
+    return button
+
+
 class StartScreen(Screen):
     def __init__(self, **kwargs):
         super(StartScreen, self).__init__(**kwargs)
@@ -92,38 +106,24 @@ class StartScreen(Screen):
         )
         root.add_widget(subtitle)
 
-        radio_button = Button(
-            text='Open Radio',
+        self.clock_label = Label(
+            text='--:--',
             font_name='Montserrat',
-            font_size='22sp',
-            size_hint=(0.34, 0.14),
-            pos_hint={'x': 0.08, 'center_y': 0.46},
-            background_color=(0.12, 0.55, 0.9, 1),
+            font_size='24sp',
+            bold=True,
+            color=(1, 1, 1, 1),
+            size_hint=(0.32, 0.08),
+            pos_hint={'right': 0.96, 'top': 0.9},
+            halign='right',
+            valign='middle',
         )
-        radio_button.bind(on_press=self.open_radio)
-        root.add_widget(radio_button)
+        self.clock_label.bind(size=self.clock_label.setter('text_size'))
+        root.add_widget(self.clock_label)
+        Clock.schedule_interval(self.update_clock, 1)
 
-        canbus_button = Button(
-            text='Open CanBus',
-            font_name='Montserrat',
-            font_size='22sp',
-            size_hint=(0.34, 0.14),
-            pos_hint={'x': 0.08, 'center_y': 0.3},
-            background_color=(0.2, 0.55, 0.35, 1),
-        )
-        canbus_button.bind(on_press=self.open_canbus)
-        root.add_widget(canbus_button)
-
-        exit_button = Button(
-            text='Exit GUI',
-            font_name='Montserrat',
-            font_size='18sp',
-            size_hint=(0.24, 0.1),
-            pos_hint={'center_x': 0.5, 'center_y': 0.24},
-            background_color=(0.7, 0.15, 0.15, 1),
-        )
-        exit_button.bind(on_press=close_gui)
-        root.add_widget(exit_button)
+        root.add_widget(make_left_button('Open Radio', 0.48, (0.12, 0.55, 0.9, 1), self.open_radio, font_size='22sp', width=0.34))
+        root.add_widget(make_left_button('Open CanBus', 0.32, (0.2, 0.55, 0.35, 1), self.open_canbus, font_size='22sp', width=0.34))
+        root.add_widget(make_left_button('Exit GUI', 0.16, (0.7, 0.15, 0.15, 1), close_gui, font_size='18sp', width=0.34))
 
         self.add_widget(root)
 
@@ -132,6 +132,9 @@ class StartScreen(Screen):
 
     def open_canbus(self, _instance):
         self.manager.current = 'canbus'
+
+    def update_clock(self, _dt):
+        self.clock_label.text = time.strftime('%H:%M')
 
 
 class RadioScreen(Screen):
@@ -175,21 +178,20 @@ class CanBusScreen(Screen):
         )
         root.add_widget(status)
 
-        home_button = Button(
-            text='Home',
-            font_name='Montserrat',
-            font_size='18sp',
-            size_hint=(0.22, 0.1),
-            pos_hint={'x': 0.08, 'y': 0.06},
-            background_color=(0.2, 0.2, 0.2, 0.95),
-        )
-        home_button.bind(on_press=self.go_home)
-        root.add_widget(home_button)
+        root.add_widget(make_left_button('Home', 0.26, (0.2, 0.2, 0.2, 0.95), self.go_home, font_size='18sp', width=0.34))
+        root.add_widget(make_left_button('Open Radio', 0.15, (0.12, 0.55, 0.9, 1), self.go_radio, font_size='18sp', width=0.34))
+        root.add_widget(make_left_button('Open CanBus', 0.04, (0.2, 0.55, 0.35, 1), self.go_canbus, font_size='18sp', width=0.34))
 
         self.add_widget(root)
 
     def go_home(self, _instance):
         self.manager.current = 'start'
+
+    def go_radio(self, _instance):
+        self.manager.current = 'radio'
+
+    def go_canbus(self, _instance):
+        self.manager.current = 'canbus'
 
 
 
@@ -293,35 +295,9 @@ class OverlayWindow(FloatLayout):
         )
         self.seek_button.bind(on_press=self.on_seek_press)
 
-        self.home_button = Button(
-            text='Home',
-            font_name='Montserrat',
-            font_size='14sp',
-            size_hint=(0.38, 0.09),
-            pos_hint={'x': 0.05, 'y': 0.04},
-            background_color=(0.2, 0.2, 0.2, 0.9)
-        )
-        self.home_button.bind(on_press=self.on_home_press)
+        self.home_button = make_left_button('Home', 0.04, (0.2, 0.2, 0.2, 0.9), self.on_home_press)
 
-        self.canbus_button = Button(
-            text='CanBus',
-            font_name='Montserrat',
-            font_size='14sp',
-            size_hint=(0.38, 0.09),
-            pos_hint={'x': 0.05, 'y': 0.15},
-            background_color=(0.2, 0.45, 0.3, 0.95)
-        )
-        self.canbus_button.bind(on_press=self.on_canbus_press)
-
-        self.exit_button = Button(
-            text='Exit GUI',
-            font_name='Montserrat',
-            font_size='14sp',
-            size_hint=(0.38, 0.09),
-            pos_hint={'x': 0.05, 'y': 0.26},
-            background_color=(0.7, 0.15, 0.15, 0.95)
-        )
-        self.exit_button.bind(on_press=close_gui)
+        self.canbus_button = make_left_button('CanBus', 0.15, (0.2, 0.45, 0.3, 0.95), self.on_canbus_press)
 
         self.sidebar.add_widget(self.station_logo)
         self.sidebar.add_widget(self.station_label)
@@ -331,7 +307,6 @@ class OverlayWindow(FloatLayout):
         self.sidebar.add_widget(self.seek_button)
         self.sidebar.add_widget(self.home_button)
         self.sidebar.add_widget(self.canbus_button)
-        self.sidebar.add_widget(self.exit_button)
         self.add_widget(self.sidebar)
 
         # Current programme data
