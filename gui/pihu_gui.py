@@ -50,6 +50,7 @@ mqtt_topic_dab_seek = "car/dab/seek"
 mqtt_topic_bg = "car/HU/bg_image"
 mqtt_topic_gui_cmd = "car/HU/gui/cmd"
 mqtt_topic_openauto_cmd = "car/HU/openauto/cmd"
+mqtt_topic_openauto_night_mode = "openauto/phone/night_mode"
 FONT_PATH = GUI_DIR / 'resources' / 'Montserrat' / 'Montserrat-VariableFont_wght.ttf'
 
 
@@ -72,12 +73,12 @@ def make_left_button(text, y, color, callback, font_size='14sp', width=0.38):
     return button
 
 
-def publish_mqtt_message(topic, payload):
+def publish_mqtt_message(topic, payload, qos=0, retain=False):
     client = mqtt.Client()
     try:
         client.connect(mqtt_broker, mqtt_port, keepalive=5)
         client.loop_start()
-        info = client.publish(topic, payload)
+        info = client.publish(topic, payload, qos=qos, retain=retain)
         info.wait_for_publish()
     except Exception as exc:
         print(f"Error publishing MQTT message to {topic}: {exc}")
@@ -167,7 +168,8 @@ class StartScreen(Screen):
 
         root.add_widget(make_left_button('Open Radio', 0.48, (0.12, 0.55, 0.9, 1), self.open_radio, font_size='22sp', width=0.34))
         root.add_widget(make_left_button('Open CanBus', 0.32, (0.2, 0.55, 0.35, 1), self.open_canbus, font_size='22sp', width=0.34))
-        root.add_widget(make_left_button('Android Auto', 0.16, (0.85, 0.5, 0.15, 1), self.open_android_auto, font_size='18sp', width=0.34))
+        root.add_widget(make_left_button('Settings', 0.16, (0.35, 0.35, 0.35, 0.95), self.open_settings, font_size='18sp', width=0.34))
+        root.add_widget(make_left_button('Android Auto', 0.10, (0.85, 0.5, 0.15, 1), self.open_android_auto, font_size='18sp', width=0.34))
         root.add_widget(make_left_button('Exit GUI', 0.04, (0.7, 0.15, 0.15, 1), close_gui, font_size='18sp', width=0.34))
 
         self.add_widget(root)
@@ -177,6 +179,9 @@ class StartScreen(Screen):
 
     def open_canbus(self, _instance):
         self.manager.current = 'canbus'
+
+    def open_settings(self, _instance):
+        self.manager.current = 'settings'
 
     def open_android_auto(self, _instance):
         publish_mqtt_message(mqtt_topic_openauto_cmd, 'focus')
@@ -296,20 +301,94 @@ class CanBusScreen(Screen):
         )
         root.add_widget(status)
 
-        root.add_widget(make_left_button('Home', 0.26, (0.2, 0.2, 0.2, 0.95), self.go_home, font_size='18sp', width=0.34))
-        root.add_widget(make_left_button('Open Radio', 0.15, (0.12, 0.55, 0.9, 1), self.go_radio, font_size='18sp', width=0.34))
-        root.add_widget(make_left_button('Open CanBus', 0.04, (0.2, 0.55, 0.35, 1), self.go_canbus, font_size='18sp', width=0.34))
+        self.add_widget(root)
+
+    def go_home(self, _instance):
+        self.manager.current = 'start'
+
+class SettingsScreen(Screen):
+    def __init__(self, **kwargs):
+        super(SettingsScreen, self).__init__(**kwargs)
+
+        root = FloatLayout()
+        bg = Image(
+            source=image_list[2],
+            allow_stretch=True,
+            keep_ratio=False,
+            size_hint=(1, 1),
+            pos_hint={'x': 0, 'y': 0},
+        )
+        root.add_widget(bg)
+
+        title = Label(
+            text='Settings',
+            font_name='Montserrat',
+            font_size='42sp',
+            bold=True,
+            color=(1, 1, 1, 1),
+            size_hint=(1, 0.2),
+            pos_hint={'center_x': 0.5, 'top': 0.9},
+        )
+        root.add_widget(title)
+
+        mode_title = Label(
+            text='OpenAuto Display Mode',
+            font_name='Montserrat',
+            font_size='22sp',
+            color=(0.95, 0.95, 0.95, 1),
+            size_hint=(1, 0.1),
+            pos_hint={'center_x': 0.5, 'top': 0.68},
+        )
+        root.add_widget(mode_title)
+
+        self.mode_status = Label(
+            text='Select Day or Night mode',
+            font_name='Montserrat',
+            font_size='16sp',
+            color=(0.88, 0.88, 0.88, 1),
+            size_hint=(1, 0.08),
+            pos_hint={'center_x': 0.5, 'top': 0.6},
+        )
+        root.add_widget(self.mode_status)
+
+        day_button = Button(
+            text='Day Mode',
+            font_name='Montserrat',
+            font_size='18sp',
+            size_hint=(0.22, 0.12),
+            pos_hint={'x': 0.32, 'y': 0.36},
+            background_color=(0.9, 0.75, 0.2, 1),
+        )
+        day_button.bind(on_press=self.set_day_mode)
+        root.add_widget(day_button)
+
+        night_button = Button(
+            text='Night Mode',
+            font_name='Montserrat',
+            font_size='18sp',
+            size_hint=(0.22, 0.12),
+            pos_hint={'x': 0.56, 'y': 0.36},
+            background_color=(0.2, 0.2, 0.3, 1),
+        )
+        night_button.bind(on_press=self.set_night_mode)
+        root.add_widget(night_button)
 
         self.add_widget(root)
 
     def go_home(self, _instance):
         self.manager.current = 'start'
 
-    def go_radio(self, _instance):
-        self.manager.current = 'radio'
+    def set_day_mode(self, _instance):
+        # Publish retained state so OpenAuto can restore mode after restart.
+        payload = json.dumps({'mode': 'day'})
+        publish_mqtt_message(mqtt_topic_openauto_night_mode, payload, qos=1, retain=True)
+        self.mode_status.text = 'OpenAuto mode set to Day'
 
-    def go_canbus(self, _instance):
-        self.manager.current = 'canbus'
+    def set_night_mode(self, _instance):
+        # Publish retained state so OpenAuto can restore mode after restart.
+        payload = json.dumps({'mode': 'night'})
+        publish_mqtt_message(mqtt_topic_openauto_night_mode, payload, qos=1, retain=True)
+        self.mode_status.text = 'OpenAuto mode set to Night'
 
 
 
@@ -413,18 +492,12 @@ class OverlayWindow(FloatLayout):
         )
         self.seek_button.bind(on_press=self.on_seek_press)
 
-        self.home_button = make_left_button('Home', 0.04, (0.2, 0.2, 0.2, 0.9), self.on_home_press)
-
-        self.canbus_button = make_left_button('CanBus', 0.15, (0.2, 0.45, 0.3, 0.95), self.on_canbus_press)
-
         self.sidebar.add_widget(self.station_logo)
         self.sidebar.add_widget(self.station_label)
         self.sidebar.add_widget(self.station_type)
         self.sidebar.add_widget(self.ensemble_label)
         self.sidebar.add_widget(self.bitrate_label)
         self.sidebar.add_widget(self.seek_button)
-        self.sidebar.add_widget(self.home_button)
-        self.sidebar.add_widget(self.canbus_button)
         self.add_widget(self.sidebar)
 
         # Current programme data
@@ -499,16 +572,6 @@ class OverlayWindow(FloatLayout):
         """Publish seek/skip command"""
         self.mqtt_client.publish(mqtt_topic_dab_seek, '1')
         print("Seek/Skip published")
-
-    def on_home_press(self, _instance):
-        app = App.get_running_app()
-        if app is not None and hasattr(app, 'screen_manager'):
-            app.screen_manager.current = 'start'
-
-    def on_canbus_press(self, _instance):
-        app = App.get_running_app()
-        if app is not None and hasattr(app, 'screen_manager'):
-            app.screen_manager.current = 'canbus'
 
     def load_background(self, image_path):
         if not os.path.isabs(image_path):
@@ -624,6 +687,7 @@ class MyApp(App):
         self.screen_manager.add_widget(BlackScreen(name='black'))
         self.screen_manager.add_widget(RadioScreen(name='radio'))
         self.screen_manager.add_widget(CanBusScreen(name='canbus'))
+        self.screen_manager.add_widget(SettingsScreen(name='settings'))
         self.screen_manager.current = 'start'
         return self.screen_manager
 
