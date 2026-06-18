@@ -14,7 +14,9 @@ Build and test from the project root.
 
 ```bash
 sudo apt update
-sudo apt install -y build-essential cmake pkg-config libusb-1.0-0-dev libmosquitto-dev nlohmann-json3-dev
+sudo apt install -y build-essential cmake pkg-config \
+    libusb-1.0-0-dev libmosquitto-dev nlohmann-json3-dev \
+    libasound2-dev libavcodec-dev libavutil-dev libswresample-dev
 ```
 
 ## 2) Configure and build
@@ -34,12 +36,14 @@ From the build directory:
 ./dab/dab-radio/dab_scan
 ./dab/dab-radio/dab_mp2
 ./dab/dab-radio/dab_aac
+
 ```
 
 Optional target (only built when MQTT + nlohmann_json are available):
 
 ```bash
 ./dab/dab-radio/dab_tuner_aac
+./dab/dab-radio/dab_play
 ```
 
 # Logo

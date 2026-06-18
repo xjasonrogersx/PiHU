@@ -22,6 +22,7 @@
 #define DABPLUSSERVICECOMPONENTDECODER_H
 
 #include <atomic>
+#include <functional>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -34,6 +35,8 @@ class DabPlusServiceComponentDecoder {
   virtual void setSubchannelBitrate(uint16_t bitrate);
   virtual void componentDataInput(const std::vector<uint8_t>& frameData,
                                   bool synchronized);
+  using LatmDataCallback = std::function<void(const std::vector<uint8_t>&)>;
+  virtual void setLatmDataCallback(LatmDataCallback callback);
 
   // special case for MscStreamAudio
   //  using PAD_DATA_CALLBACK = std::function<void (const
@@ -104,6 +107,7 @@ class DabPlusServiceComponentDecoder {
   std::vector<uint8_t> m_unsyncDataBuffer;
   bool m_unsyncSync{false};
   int m_unsyncFrameCount{0};
+  LatmDataCallback m_latmDataCallback;
 
  private:
   void processData(const std::vector<uint8_t>& frameData);
